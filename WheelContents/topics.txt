@@ -1,0 +1,40 @@
+Wild Animals|🦁
+Pets|🐕
+Ocean Creatures|🐠
+Birds|🦅
+Insects|🦋
+Dinosaurs|🦕
+Dragons|🐉
+Monsters|👾
+Robots|🤖
+Aliens|👽
+Superheroes|🦸
+Princesses & Knights|👑
+Pirates|🏴‍☠️
+Ninjas|🥷
+Wizards|🧙
+Fairies|🧚
+Mermaids|🧜
+Space & Planets|🪐
+Weather|⛈️
+Seasons|🍂
+Food & Snacks|🍕
+Desserts|🍰
+Vehicles|🚗
+Buildings|🏢
+Trees & Plants|🌳
+Flowers|🌻
+Sports|⚽
+Musical Instruments|🎸
+Toys|🧸
+School Supplies|✏️
+Emotions/Feelings|😊
+Underwater World|🐙
+Circus|🎪
+Farm Life|🚜
+Jungle Adventure|🌴
+Arctic Animals|🐧
+Desert Life|🌵
+Mythical Creatures|🦄
+Household Items|🏠
+Playground Equipment|🎠

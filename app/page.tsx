@@ -2,42 +2,71 @@
 
 import React, { useState, useEffect } from 'react';
 import SpinningWheel from '@/components/SpinningWheel';
-import ResultDisplay from '@/components/ResultDisplay';
-import { topics, constraints, wheelColors } from '@/lib/wheelData';
+import { wheelColors } from '@/lib/wheelData';
 import { initializeSounds, playCelebration } from '@/lib/sounds';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 
-export default function Home() {
-  const [selectedTopic, setSelectedTopic] = useState<typeof topics[0] | null>(null);
-  const [selectedConstraint, setSelectedConstraint] = useState<typeof constraints[0] | null>(null);
+interface WheelSegment {
+  id: number;
+  text: string;
+  emoji: string;
+}
+
+interface HomeProps {
+  topics: WheelSegment[];
+  constraints: WheelSegment[];
+}
+
+export default function Home({ topics, constraints }: HomeProps) {
+  const [selectedTopic, setSelectedTopic] = useState<WheelSegment | null>(null);
+  const [selectedConstraint, setSelectedConstraint] = useState<WheelSegment | null>(null);
   const [isSpinningTopic, setIsSpinningTopic] = useState(false);
   const [isSpinningConstraint, setIsSpinningConstraint] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [wheelData, setWheelData] = useState<{ topics: WheelSegment[], constraints: WheelSegment[] }>({ topics: [], constraints: [] });
 
   useEffect(() => {
+    // Load wheel data from API
+    fetch('/api/wheel-data')
+      .then(res => res.json())
+      .then(data => setWheelData(data))
+      .catch(err => console.error('Failed to load wheel data:', err));
+      
     initializeSounds();
   }, []);
 
   useEffect(() => {
     if (selectedTopic && selectedConstraint && !isSpinningTopic && !isSpinningConstraint) {
       playCelebration();
-      setTimeout(() => setShowResults(true), 500);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3']
+      });
     }
   }, [selectedTopic, selectedConstraint, isSpinningTopic, isSpinningConstraint]);
 
-  const handleTopicComplete = (result: typeof topics[0]) => {
+  const handleTopicComplete = (result: WheelSegment) => {
     setSelectedTopic(result);
   };
 
-  const handleConstraintComplete = (result: typeof constraints[0]) => {
+  const handleConstraintComplete = (result: WheelSegment) => {
     setSelectedConstraint(result);
   };
 
   const handleReset = () => {
     setSelectedTopic(null);
     setSelectedConstraint(null);
-    setShowResults(false);
   };
+
+  if (wheelData.topics.length === 0 || wheelData.constraints.length === 0) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
+        <div className="text-white text-2xl">Loading wheel data...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex flex-col items-center justify-center p-8">
@@ -66,13 +95,29 @@ export default function Home() {
           </h2>
           <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
             <SpinningWheel
-              segments={topics}
+              segments={wheelData.topics}
               colors={wheelColors}
               onSpinComplete={handleTopicComplete}
               isSpinning={isSpinningTopic}
               setIsSpinning={setIsSpinningTopic}
             />
           </div>
+          
+          <AnimatePresence mode="wait">
+            {selectedTopic && (
+              <motion.div
+                key={selectedTopic.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="mt-6 bg-white/90 rounded-2xl p-4 shadow-lg"
+              >
+                <p className="text-2xl font-bold text-gray-800">
+                  {selectedTopic.emoji} {selectedTopic.text}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         <motion.div
@@ -86,32 +131,44 @@ export default function Home() {
           </h2>
           <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
             <SpinningWheel
-              segments={constraints}
-              colors={wheelColors.reverse()}
+              segments={wheelData.constraints}
+              colors={wheelColors.slice().reverse()}
               onSpinComplete={handleConstraintComplete}
               isSpinning={isSpinningConstraint}
               setIsSpinning={setIsSpinningConstraint}
             />
           </div>
+          
+          <AnimatePresence mode="wait">
+            {selectedConstraint && (
+              <motion.div
+                key={selectedConstraint.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="mt-6 bg-white/90 rounded-2xl p-4 shadow-lg"
+              >
+                <p className="text-2xl font-bold text-gray-800">
+                  {selectedConstraint.emoji} {selectedConstraint.text}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 
-      <ResultDisplay
-        topic={selectedTopic}
-        constraint={selectedConstraint}
-        onReset={handleReset}
-      />
-
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="mt-12 text-center"
-      >
-        <p className="text-white/80 text-lg">
-          Click each wheel to spin! Get ready for a fun drawing challenge! 
-        </p>
-      </motion.div>
+      {selectedTopic && selectedConstraint && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleReset}
+          className="mt-12 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+        >
+          Spin Again! 🎨
+        </motion.button>
+      )}
     </main>
   );
 }

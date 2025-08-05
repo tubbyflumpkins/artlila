@@ -49,8 +49,6 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({
     const finalRotation = rotation + spins * 360 + Math.random() * 360;
     const duration = 4000 + Math.random() * 2000;
 
-    let lastPegHit = -1;
-
     animate(rotation, finalRotation, {
       duration: duration / 1000,
       ease: [0.17, 0.67, 0.12, 0.99],
@@ -58,20 +56,22 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({
         setRotation(latest);
         
         const currentRotationDegrees = latest % 360;
-        const pegHit = Math.floor(currentRotationDegrees / (360 / numberOfPegs));
+        const currentPegHit = Math.floor(currentRotationDegrees / (360 / numberOfPegs));
         
-        if (pegHit !== lastPegHit) {
+        if (currentPegHit !== lastTickRef.current && isSpinning) {
           const progress = (latest - rotation) / (finalRotation - rotation);
           const rate = Math.max(0.5, 2 - progress * 1.5);
           playTick(rate);
-          lastPegHit = pegHit;
+          lastTickRef.current = currentPegHit;
         }
       },
       onComplete: () => {
         stopDrumroll();
-        const finalAngle = (360 - (finalRotation % 360) + 90) % 360;
-        const winningIndex = Math.floor(finalAngle / segmentAngle);
-        const winner = segments[segments.length - 1 - winningIndex];
+        // Calculate which segment is at the top (270 degrees in our coordinate system) where the triangle points
+        const normalizedRotation = finalRotation % 360;
+        const topAngle = (270 - normalizedRotation + 360) % 360;
+        const winningIndex = Math.floor(topAngle / segmentAngle) % segments.length;
+        const winner = segments[winningIndex];
         
         setTimeout(() => {
           onSpinComplete(winner);
@@ -101,10 +101,10 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({
               const startAngleRad = (startAngle * Math.PI) / 180;
               const endAngleRad = (endAngle * Math.PI) / 180;
               
-              const x1 = 200 + 180 * Math.cos(startAngleRad);
-              const y1 = 200 + 180 * Math.sin(startAngleRad);
-              const x2 = 200 + 180 * Math.cos(endAngleRad);
-              const y2 = 200 + 180 * Math.sin(endAngleRad);
+              const x1 = Math.round((200 + 180 * Math.cos(startAngleRad)) * 100) / 100;
+              const y1 = Math.round((200 + 180 * Math.sin(startAngleRad)) * 100) / 100;
+              const x2 = Math.round((200 + 180 * Math.cos(endAngleRad)) * 100) / 100;
+              const y2 = Math.round((200 + 180 * Math.sin(endAngleRad)) * 100) / 100;
               
               const largeArc = segmentAngle > 180 ? 1 : 0;
               
@@ -118,27 +118,23 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({
                   />
                   
                   <circle
-                    cx={200 + 170 * Math.cos((startAngleRad + endAngleRad) / 2)}
-                    cy={200 + 170 * Math.sin((startAngleRad + endAngleRad) / 2)}
+                    cx={Math.round((200 + 170 * Math.cos((startAngleRad + endAngleRad) / 2)) * 100) / 100}
+                    cy={Math.round((200 + 170 * Math.sin((startAngleRad + endAngleRad) / 2)) * 100) / 100}
                     r="4"
                     fill="#fff"
                     opacity="0.7"
                   />
                   
                   <text
-                    x={200 + 120 * Math.cos((startAngleRad + endAngleRad) / 2)}
-                    y={200 + 120 * Math.sin((startAngleRad + endAngleRad) / 2)}
+                    x={Math.round((200 + 150 * Math.cos((startAngleRad + endAngleRad) / 2)) * 100) / 100}
+                    y={Math.round((200 + 150 * Math.sin((startAngleRad + endAngleRad) / 2)) * 100) / 100}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    className="fill-white font-bold text-sm select-none"
-                    transform={`rotate(${startAngle + segmentAngle / 2} ${200 + 120 * Math.cos((startAngleRad + endAngleRad) / 2)} ${200 + 120 * Math.sin((startAngleRad + endAngleRad) / 2)})`}
+                    className="text-2xl select-none"
+                    style={{ fontSize: '28px' }}
+                    transform={`rotate(${(startAngle + endAngle) / 2 + 90} ${Math.round((200 + 150 * Math.cos((startAngleRad + endAngleRad) / 2)) * 100) / 100} ${Math.round((200 + 150 * Math.sin((startAngleRad + endAngleRad) / 2)) * 100) / 100})`}
                   >
-                    <tspan x={200 + 120 * Math.cos((startAngleRad + endAngleRad) / 2)} dy="-0.3em">
-                      {segment.emoji}
-                    </tspan>
-                    <tspan x={200 + 120 * Math.cos((startAngleRad + endAngleRad) / 2)} dy="1.2em" className="text-xs">
-                      {segment.text}
-                    </tspan>
+                    {segment.emoji}
                   </text>
                 </g>
               );
@@ -158,27 +154,15 @@ const SpinningWheel: React.FC<SpinningWheelProps> = ({
         </motion.div>
       </div>
       
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10">
-        <motion.div
-          animate={{ 
-            rotate: isSpinning ? [0, -5, 5, -5, 5, 0] : 0,
-            scale: currentSegment !== lastTickRef.current ? [1, 1.1, 1] : 1
-          }}
-          transition={{ duration: 0.1 }}
-          onAnimationComplete={() => {
-            lastTickRef.current = currentSegment;
-          }}
-        >
-          <svg width="60" height="80" viewBox="0 0 60 80" className="filter drop-shadow-lg">
-            <path
-              d="M30 0 L50 40 L30 80 L10 40 Z"
-              fill="#E74C3C"
-              stroke="#C0392B"
-              strokeWidth="2"
-            />
-            <circle cx="30" cy="40" r="8" fill="#C0392B" />
-          </svg>
-        </motion.div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
+        <svg width="24" height="20" viewBox="0 0 24 20" className="filter drop-shadow-lg">
+          <path
+            d="M6 0 L18 0 L12 20 Z"
+            fill="#E74C3C"
+            stroke="#C0392B"
+            strokeWidth="2"
+          />
+        </svg>
       </div>
     </div>
   );
