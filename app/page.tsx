@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import SpinningWheel from '@/components/SpinningWheel';
+import EditButton from '@/components/EditButton';
 import { wheelColors } from '@/lib/wheelData';
 import { initializeSounds, playCelebration } from '@/lib/sounds';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,15 +25,24 @@ export default function Home({ topics, constraints }: HomeProps) {
   const [isSpinningTopic, setIsSpinningTopic] = useState(false);
   const [isSpinningConstraint, setIsSpinningConstraint] = useState(false);
   const [wheelData, setWheelData] = useState<{ topics: WheelSegment[], constraints: WheelSegment[] }>({ topics: [], constraints: [] });
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
     // Load wheel data from API
     fetch('/api/wheel-data')
       .then(res => res.json())
       .then(data => setWheelData(data))
-      .catch(err => console.error('Failed to load wheel data:', err));
+      .catch(err => console.error('\u00c9chec du chargement des donn\u00e9es des roues:', err));
       
     initializeSounds();
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -63,7 +73,7 @@ export default function Home({ topics, constraints }: HomeProps) {
   if (wheelData.topics.length === 0 || wheelData.constraints.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
-        <div className="text-white text-2xl">Loading wheel data...</div>
+        <div className="text-white text-2xl">Chargement des données...</div>
       </main>
     );
   }
@@ -76,10 +86,20 @@ export default function Home({ topics, constraints }: HomeProps) {
         className="text-center mb-12"
       >
         <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
-          ArtLila Sketch Time! 🎨
+          Moment Dessin
         </h1>
         <p className="text-2xl text-white/90 drop-shadow">
-          Spin the wheels to get your drawing challenge!
+          On est <span className="font-bold">{currentDateTime.toLocaleDateString('fr-FR', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</span>, il est <span className="font-bold">{currentDateTime.toLocaleTimeString('fr-FR', { 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+          })}</span>.
         </p>
       </motion.div>
 
@@ -91,7 +111,7 @@ export default function Home({ topics, constraints }: HomeProps) {
           className="flex flex-col items-center"
         >
           <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            What to Draw? 🤔
+            Quoi dessiner? 🤔
           </h2>
           <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
             <SpinningWheel
@@ -127,7 +147,7 @@ export default function Home({ topics, constraints }: HomeProps) {
           className="flex flex-col items-center"
         >
           <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            How to Draw It? 🎯
+            Comment dessiner? 🎯
           </h2>
           <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
             <SpinningWheel
@@ -166,9 +186,11 @@ export default function Home({ topics, constraints }: HomeProps) {
           onClick={handleReset}
           className="mt-12 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
         >
-          Spin Again! 🎨
+          Tourner encore! 🎨
         </motion.button>
       )}
+
+      <EditButton />
     </main>
   );
 }

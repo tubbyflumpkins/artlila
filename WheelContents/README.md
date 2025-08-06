@@ -6,10 +6,10 @@ This folder contains the content for the spinning wheels in ArtLila.
 
 Each line in the `.txt` files should follow this format:
 ```
-Text Description|Emoji
+Text Description, Emoji
 ```
 
-**Important:** Use the pipe character `|` to separate the text from the emoji.
+**Important:** Use a comma `,` to separate the text from the emoji.
 
 ## Files
 
@@ -20,9 +20,9 @@ Contains all the drawing topics (what to draw). Each line should have:
 
 Example:
 ```
-Wild Animals|🦁
-Ocean Creatures|🐠
-Robots|🤖
+Wild Animals, 🦁
+Ocean Creatures, 🐠
+Robots, 🤖
 ```
 
 ### constraints.txt
@@ -32,9 +32,9 @@ Contains all the drawing constraints (how to draw it). Each line should have:
 
 Example:
 ```
-One continuous line|✏️
-Use only circles|⭕
-Draw upside down|🙃
+One continuous line, ✏️
+Use only circles, ⭕
+Draw upside down, 🙃
 ```
 
 ## How to Edit

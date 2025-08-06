@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ArtLila - Elementary Art Class Companion",
-  description: "Interactive spinning wheels for creative drawing challenges in elementary art class",
+  title: "Moment Dessin",
+  description: "Roues interactives pour des d\u00e9fis de dessin cr\u00e9atifs en classe d'art",
 };
 
 export default function RootLayout({

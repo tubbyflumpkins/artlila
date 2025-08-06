@@ -1,30 +1,31 @@
-One continuous line|✏️
-Use only circles|⭕
-Use only squares|⬜
-Non-dominant hand|🤚
-Draw upside down|🙃
-Eyes closed|😑
-Use only dots|•
-Draw in 30 seconds|⏱️
-Tiny (thumb-sized)|🤏
-HUGE (fill the page)|📄
-Use only 3 colors|🎨
-Make it rainbow|🌈
-Only straight lines|📏
-Only curved lines|〰️
-Add patterns everywhere|🔲
-Make it symmetrical|🪞
-Robot version|🤖
-Draw it melting|💧
-Draw it flying|🕊️
-Add silly accessories|🎩
-Draw it dancing|💃
-Make it look angry|😠
-Make it look happy|😄
-Draw it wearing a hat|🧢
-Give it superpowers|⚡
-Baby version|👶
-Make it sparkly|✨
-Draw it in a storm|🌩️
-Draw it sleeping|😴
-Shapes only|🔷
+Utilise seulement des coeurs, ❤️
+Une ligne continue, ✏️
+Utilise seulement des cercles, ⭕
+Utilise seulement des carrés, ⬜
+Main non dominante, 🤚
+Dessine à l'envers, 🙃
+Les yeux fermés, 😑
+Utilise seulement des points, •
+Dessine en 30 secondes, ⏱️
+Minuscule (taille du pouce), 🤏
+ÉNORME (remplis la page), 📄
+Utilise seulement 3 couleurs, 🎨
+Fais-le arc-en-ciel, 🌈
+Seulement lignes droites, 📏
+Seulement lignes courbes, 〰️
+Ajoute des motifs partout, 🔲
+Rends-le symétrique, 🪞
+Version robot, 🤖
+Dessine-le en train de fondre, 💧
+Dessine-le en train de voler, 🕊️
+Ajoute des accessoires rigolos, 🎩
+Dessine-le en train de danser, 💃
+Rends-le fâché, 😠
+Rends-le joyeux, 😄
+Dessine-le avec un chapeau, 🧢
+Donne-lui des super-pouvoirs, ⚡
+Version bébé, 👶
+Rends-le brillant, ✨
+Dessine-le dans une tempête, 🌩️
+Dessine-le en train de dormir, 😴
+Formes seulement, 🔷

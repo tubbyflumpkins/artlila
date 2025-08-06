@@ -13,11 +13,18 @@ function parseWheelFile(filePath: string): WheelSegment[] {
     const lines = fileContent.split('\n').filter(line => line.trim() !== '');
     
     return lines.map((line, index) => {
-      const [text, emoji] = line.split('|');
+      // Handle both pipe and comma separators for backward compatibility
+      const separator = line.includes('|') ? '|' : ',';
+      const parts = line.split(separator);
+      
+      // Take the last part as emoji and everything before as text
+      const emoji = parts[parts.length - 1].trim();
+      const text = parts.slice(0, -1).join(separator).trim();
+      
       return {
         id: index + 1,
-        text: text.trim(),
-        emoji: emoji.trim()
+        text: text || emoji, // Fallback to emoji if no text
+        emoji: emoji
       };
     });
   } catch (error) {

@@ -1,40 +1,40 @@
-Wild Animals|🦁
-Pets|🐕
-Ocean Creatures|🐠
-Birds|🦅
-Insects|🦋
-Dinosaurs|🦕
-Dragons|🐉
-Monsters|👾
-Robots|🤖
-Aliens|👽
-Superheroes|🦸
-Princesses & Knights|👑
-Pirates|🏴‍☠️
-Ninjas|🥷
-Wizards|🧙
-Fairies|🧚
-Mermaids|🧜
-Space & Planets|🪐
-Weather|⛈️
-Seasons|🍂
-Food & Snacks|🍕
-Desserts|🍰
-Vehicles|🚗
-Buildings|🏢
-Trees & Plants|🌳
-Flowers|🌻
-Sports|⚽
-Musical Instruments|🎸
-Toys|🧸
-School Supplies|✏️
-Emotions/Feelings|😊
-Underwater World|🐙
-Circus|🎪
-Farm Life|🚜
-Jungle Adventure|🌴
-Arctic Animals|🐧
-Desert Life|🌵
-Mythical Creatures|🦄
-Household Items|🏠
-Playground Equipment|🎠
+Animaux sauvages, 🦁
+Animaux de compagnie, 🐕
+Créatures marines, 🐠
+Oiseaux, 🦅
+Insectes, 🦋
+Dinosaures, 🦕
+Dragons, 🐉
+Monstres, 👾
+Robots, 🤖
+Extraterrestres, 👽
+Super-héros, 🦸
+Princesses et chevaliers, 👑
+Pirates, 🏴‍☠️
+Ninjas, 🥷
+Sorciers, 🧙
+Fées, 🧚
+Sirènes, 🧜
+Espace et planètes, 🪐
+Météo, ⛈️
+Saisons, 🍂
+Nourriture et collations, 🍕
+Desserts, 🍰
+Véhicules, 🚗
+Bâtiments, 🏢
+Arbres et plantes, 🌳
+Fleurs, 🌻
+Sports, ⚽
+Instruments de musique, 🎸
+Jouets, 🧸
+Fournitures scolaires, ✏️
+Émotions/Sentiments, 😊
+Monde sous-marin, 🐙
+Cirque, 🎪
+Vie à la ferme, 🚜
+Aventure dans la jungle, 🌴
+Animaux arctiques, 🐧
+Vie dans le désert, 🌵
+Créatures mythiques, 🦄
+Articles ménagers, 🏠
+Équipement de terrain de jeu, 🎠
