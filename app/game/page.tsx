@@ -14,12 +14,7 @@ interface WheelSegment {
   emoji: string;
 }
 
-interface GameProps {
-  topics: WheelSegment[];
-  constraints: WheelSegment[];
-}
-
-export default function Game({ topics, constraints }: GameProps) {
+export default function Game() {
   const [selectedTopic, setSelectedTopic] = useState<WheelSegment | null>(null);
   const [selectedConstraint, setSelectedConstraint] = useState<WheelSegment | null>(null);
   const [isSpinningTopic, setIsSpinningTopic] = useState(false);
