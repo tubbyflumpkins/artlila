@@ -1,18 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { BilingualText } from '@/lib/presentations/types';
+import { getText } from '@/lib/presentations/bilingualHelpers';
 
 interface CreativeTextSlideProps {
   items: Array<{
-    text: string;
+    text: BilingualText;
     emoji?: string;
     color?: string;
     size?: 'small' | 'medium' | 'large' | 'huge';
   }>;
   layout?: 'scattered' | 'circular' | 'wave' | 'grid';
   background?: string;
+  language?: 'fr' | 'en';
 }
 
-export default function CreativeTextSlide({ items, layout = 'scattered', background = 'bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100' }: CreativeTextSlideProps) {
+export default function CreativeTextSlide({ items, layout = 'scattered', background = 'bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100', language = 'fr' }: CreativeTextSlideProps) {
   const getPositionStyles = (index: number, total: number) => {
     switch (layout) {
       case 'circular':
@@ -114,7 +117,7 @@ export default function CreativeTextSlide({ items, layout = 'scattered', backgro
                 <span className="block text-6xl mb-2">{textItem.emoji}</span>
               )}
               <span className={textItem.color ? '' : 'text-gray-800'}>
-                {textItem.text}
+                {getText(textItem.text, language)}
               </span>
             </div>
           </motion.div>

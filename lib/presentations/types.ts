@@ -19,17 +19,17 @@ export interface BaseSlide {
 export interface TitleSlide extends BaseSlide {
   type: 'title';
   content: {
-    title: string;
-    subtitle?: string;
-    date?: string;
+    title: BilingualText;
+    subtitle?: BilingualText;
+    date?: BilingualText;
   };
 }
 
 export interface TextSlide extends BaseSlide {
   type: 'text';
   content: {
-    heading?: string;
-    text: string;
+    heading?: BilingualText;
+    text: BilingualText;
     alignment?: 'left' | 'center' | 'right';
   };
 }
@@ -37,8 +37,8 @@ export interface TextSlide extends BaseSlide {
 export interface BulletSlide extends BaseSlide {
   type: 'bullets';
   content: {
-    title: string;
-    bullets: string[];
+    title: BilingualText;
+    bullets: BilingualText[];
     numbered?: boolean;
   };
 }
@@ -46,9 +46,9 @@ export interface BulletSlide extends BaseSlide {
 export interface ImageSlide extends BaseSlide {
   type: 'image';
   content: {
-    title?: string;
+    title?: BilingualText;
     imageUrl: string;
-    caption?: string;
+    caption?: BilingualText;
     size?: 'full' | 'large' | 'medium' | 'small';
   };
 }
@@ -56,7 +56,7 @@ export interface ImageSlide extends BaseSlide {
 export interface SplitSlide extends BaseSlide {
   type: 'split';
   content: {
-    title?: string;
+    title?: BilingualText;
     left: {
       type: 'text' | 'bullets' | 'image';
       content: any;

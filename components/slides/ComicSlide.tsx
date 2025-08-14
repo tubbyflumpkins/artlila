@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { BilingualText } from '@/lib/presentations/types';
+import { getText } from '@/lib/presentations/bilingualHelpers';
 
 interface ComicPanel {
-  text?: string;
+  text?: BilingualText;
   emoji?: string;
   background: string;
   speechBubble?: boolean;
@@ -10,10 +12,11 @@ interface ComicPanel {
 
 interface ComicSlideProps {
   panels: ComicPanel[];
-  title?: string;
+  title?: BilingualText;
+  language?: 'fr' | 'en';
 }
 
-export default function ComicSlide({ panels, title }: ComicSlideProps) {
+export default function ComicSlide({ panels, title, language = 'fr' }: ComicSlideProps) {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -47,7 +50,7 @@ export default function ComicSlide({ panels, title }: ComicSlideProps) {
           className="text-5xl font-cooper text-center mb-6 text-red-600"
           style={{ textShadow: '3px 3px 0 #000' }}
         >
-          {title}
+          {getText(title, language)}
         </motion.h1>
       )}
       
@@ -96,7 +99,7 @@ export default function ComicSlide({ panels, title }: ComicSlideProps) {
                   "text-center"
                 }>
                   <p className="font-neue-haas font-bold text-lg text-black">
-                    {item.text}
+                    {getText(item.text, language)}
                   </p>
                   {item.speechBubble && (
                     <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-0 h-0 
