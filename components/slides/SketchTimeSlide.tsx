@@ -130,7 +130,7 @@ export default function SketchTimeSlide({ subtitle, title, language = 'fr' }: Sk
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", duration: 1 }}
+            transition={{ type: "spring" as const, duration: 1 }}
             className="relative w-64 h-64 md:w-72 md:h-72"
           >
             {/* Wheel */}
@@ -198,7 +198,7 @@ export default function SketchTimeSlide({ subtitle, title, language = 'fr' }: Sk
           <motion.button
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.5, type: "spring" }}
+            transition={{ delay: 0.5, type: "spring" as const }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push('/game')}
