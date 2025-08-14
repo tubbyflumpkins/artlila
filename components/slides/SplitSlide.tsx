@@ -1,26 +1,28 @@
 import React from 'react';
 import { SplitSlide as SplitSlideType } from '@/lib/presentations/types';
+import { getText } from '@/lib/presentations/bilingualHelpers';
 import { motion } from 'framer-motion';
 
 interface SplitSlideProps {
   slide: SplitSlideType;
+  language?: 'fr' | 'en';
 }
 
-function renderContent(side: { type: string; content: any }) {
+function renderContent(side: { type: string; content: any }, language: 'fr' | 'en') {
   switch (side.type) {
     case 'text':
       return (
         <div className="font-neue-haas text-lg md:text-xl lg:text-2xl font-light text-gray-700 leading-relaxed">
-          {side.content}
+          {getText(side.content, language)}
         </div>
       );
     
     case 'bullets':
       return (
         <ul className="list-disc list-inside space-y-3">
-          {side.content.map((bullet: string, index: number) => (
+          {side.content.map((bullet: any, index: number) => (
             <li key={index} className="font-neue-haas text-lg md:text-xl lg:text-2xl font-light text-gray-700">
-              <span className="ml-2">{bullet}</span>
+              <span className="ml-2">{getText(bullet, language)}</span>
             </li>
           ))}
         </ul>
@@ -30,7 +32,7 @@ function renderContent(side: { type: string; content: any }) {
       return (
         <img
           src={side.content.url}
-          alt={side.content.alt || 'Slide image'}
+          alt={getText(side.content.alt || 'Slide image', language)}
           className="w-full h-full object-contain rounded-lg"
         />
       );
@@ -40,7 +42,7 @@ function renderContent(side: { type: string; content: any }) {
   }
 }
 
-export default function SplitSlide({ slide }: SplitSlideProps) {
+export default function SplitSlide({ slide, language = 'fr' }: SplitSlideProps) {
   const { title, left, right } = slide.content;
 
   return (
@@ -53,7 +55,7 @@ export default function SplitSlide({ slide }: SplitSlideProps) {
     >
       {title && (
         <h2 className="font-cooper text-5xl md:text-6xl text-gray-800 mb-12 text-center">
-          {title}
+          {getText(title, language)}
         </h2>
       )}
       
@@ -64,7 +66,7 @@ export default function SplitSlide({ slide }: SplitSlideProps) {
           transition={{ delay: 0.1 }}
           className="flex flex-col justify-center"
         >
-          {renderContent(left)}
+          {renderContent(left, language)}
         </motion.div>
         
         <motion.div
@@ -73,7 +75,7 @@ export default function SplitSlide({ slide }: SplitSlideProps) {
           transition={{ delay: 0.2 }}
           className="flex flex-col justify-center"
         >
-          {renderContent(right)}
+          {renderContent(right, language)}
         </motion.div>
       </div>
     </motion.div>

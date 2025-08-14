@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextSlide as TextSlideType } from '@/lib/presentations/types';
-import { motion } from 'framer-motion';
 import { getText } from '@/lib/presentations/bilingualHelpers';
+import { motion } from 'framer-motion';
 
 interface TextSlideProps {
   slide: TextSlideType;
@@ -31,7 +31,7 @@ export default function TextSlide({ slide, language = 'fr' }: TextSlideProps) {
         </h2>
       )}
       
-      <div className="font-neue-haas text-xl md:text-2xl lg:text-3xl font-light text-gray-700 leading-relaxed whitespace-pre-line">
+      <div className="font-neue-haas text-xl md:text-2xl lg:text-3xl font-light text-gray-700 leading-relaxed whitespace-pre-wrap">
         {getText(text, language)}
       </div>
     </motion.div>

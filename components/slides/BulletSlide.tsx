@@ -1,12 +1,14 @@
 import React from 'react';
 import { BulletSlide as BulletSlideType } from '@/lib/presentations/types';
+import { getText } from '@/lib/presentations/bilingualHelpers';
 import { motion } from 'framer-motion';
 
 interface BulletSlideProps {
   slide: BulletSlideType;
+  language?: 'fr' | 'en';
 }
 
-export default function BulletSlide({ slide }: BulletSlideProps) {
+export default function BulletSlide({ slide, language = 'fr' }: BulletSlideProps) {
   const { title, bullets, numbered = false } = slide.content;
 
   const container = {
@@ -33,7 +35,7 @@ export default function BulletSlide({ slide }: BulletSlideProps) {
       className="h-full flex flex-col justify-center p-12 md:p-16 lg:p-20"
     >
       <h2 className="font-cooper text-4xl md:text-5xl lg:text-6xl text-gray-800 mb-8 md:mb-12">
-        {title}
+        {getText(title, language)}
       </h2>
       
       <motion.ul
@@ -48,7 +50,7 @@ export default function BulletSlide({ slide }: BulletSlideProps) {
             variants={item}
             className="font-neue-haas text-xl md:text-2xl lg:text-3xl font-light text-gray-700"
           >
-            <span className="ml-2">{bullet}</span>
+            <span className="ml-2">{getText(bullet, language)}</span>
           </motion.li>
         ))}
       </motion.ul>
