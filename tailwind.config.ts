@@ -7,7 +7,12 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'cooper': ['var(--font-cooper)', 'serif'],
+        'neue-haas': ['var(--font-neue-haas)', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };

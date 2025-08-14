@@ -13,7 +13,6 @@ Utilise seulement 3 couleurs, 🎨
 Fais-le arc-en-ciel, 🌈
 Seulement lignes droites, 📏
 Seulement lignes courbes, 〰️
-Ajoute des motifs partout, 🔲
 Rends-le symétrique, 🪞
 Version robot, 🤖
 Dessine-le en train de fondre, 💧
