@@ -93,7 +93,7 @@ export default function SketchTimeSlide({ subtitle, title, language = 'fr' }: Sk
           <motion.h1
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="font-cooper text-3xl md:text-4xl lg:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 whitespace-nowrap"
+            className="font-cooper text-3xl md:text-4xl lg:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 text-center"
           >
             {getText(title, language)}
           </motion.h1>

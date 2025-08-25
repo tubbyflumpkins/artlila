@@ -3,6 +3,8 @@ import BackgroundImageTitleSlide from '@/components/slides/BackgroundImageTitleS
 import BubbleSlide from '@/components/slides/BubbleSlide';
 import ThreeColumnSlide from '@/components/slides/ThreeColumnSlide';
 import SketchTimeSlide from '@/components/slides/SketchTimeSlide';
+import FourImageGrid from '@/components/slides/FourImageGrid';
+import ThreeRespectSlide from '@/components/slides/ThreeRespectSlide';
 
 export const welcomeToArtClass: Presentation = {
   id: 'week1-welcome',
@@ -46,15 +48,36 @@ export const welcomeToArtClass: Presentation = {
       }
     },
     {
+      type: 'text',
+      content: {
+        heading: { fr: 'Les règles de la classe workshop', en: 'Class Rules Workshop' },
+        text: '',
+        alignment: 'center'
+      }
+    },
+    {
       type: 'custom',
       content: {
-        component: ThreeColumnSlide,
+        component: ThreeRespectSlide,
         props: {
-          title: { fr: 'Ce que nous ferons cette année', en: 'What we\'ll do this year' },
-          columns: [
-            { emoji: '👥', text: { fr: 'Projets collaboratifs', en: 'Collaborative projects' } },
-            { emoji: '🎨', text: { fr: 'Large gamme de matériaux et de styles', en: 'Wide range of materials and styles' } },
-            { emoji: '⭐', text: { fr: 'Artistes en vedette', en: 'Featured artists' } }
+          respects: [
+            { fr: 'Respecter les uns les autres', en: 'Respect each other' },
+            { fr: 'Respecter la salle de classe', en: 'Respect the classroom' },
+            { fr: 'Respecter le matériel d\'art', en: 'Respect the art supplies' }
+          ]
+        }
+      }
+    },
+    {
+      type: 'custom',
+      content: {
+        component: FourImageGrid,
+        props: {
+          images: [
+            '/images/week_1/pollock/famous-jackson-pollock-paintings-1200x800.jpg',
+            '/images/week_1/pollock/Image-2-4.jpg',
+            '/images/week_1/pollock/Full-Fathom-Five-1947.jpg',
+            '/images/week_1/pollock/Jackson-Pollock,-Autumn--01.jpg'
           ]
         }
       }
