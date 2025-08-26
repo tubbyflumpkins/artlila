@@ -33,12 +33,28 @@ function parseWheelFile(filePath: string): WheelSegment[] {
   }
 }
 
-export function loadTopics(): WheelSegment[] {
-  const topicsPath = path.join(process.cwd(), 'WheelContents', 'topics.txt');
+export function loadTopics(language: 'fr' | 'en' = 'fr'): WheelSegment[] {
+  const filename = language === 'en' ? 'topics-en.txt' : 'topics.txt';
+  const topicsPath = path.join(process.cwd(), 'WheelContents', filename);
+  
+  // Fallback to French if English file doesn't exist
+  if (language === 'en' && !fs.existsSync(topicsPath)) {
+    const frenchPath = path.join(process.cwd(), 'WheelContents', 'topics.txt');
+    return parseWheelFile(frenchPath);
+  }
+  
   return parseWheelFile(topicsPath);
 }
 
-export function loadConstraints(): WheelSegment[] {
-  const constraintsPath = path.join(process.cwd(), 'WheelContents', 'constraints.txt');
+export function loadConstraints(language: 'fr' | 'en' = 'fr'): WheelSegment[] {
+  const filename = language === 'en' ? 'constraints-en.txt' : 'constraints.txt';
+  const constraintsPath = path.join(process.cwd(), 'WheelContents', filename);
+  
+  // Fallback to French if English file doesn't exist
+  if (language === 'en' && !fs.existsSync(constraintsPath)) {
+    const frenchPath = path.join(process.cwd(), 'WheelContents', 'constraints.txt');
+    return parseWheelFile(frenchPath);
+  }
+  
   return parseWheelFile(constraintsPath);
 }

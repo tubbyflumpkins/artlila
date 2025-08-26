@@ -84,6 +84,17 @@ export default function Home() {
               </span>
             </button>
           </Link>
+
+          <Link href="/schedule">
+            <button className="group relative px-12 py-6 bg-white border-2 border-gray-300 rounded-lg hover:border-gray-400 transition-all duration-300 hover:shadow-lg">
+              <span className="text-2xl font-neue-haas font-bold text-gray-700 group-hover:text-gray-900">
+                Schedule
+              </span>
+              <span className="block text-sm font-neue-haas font-normal text-gray-500 mt-1">
+                My teaching schedule
+              </span>
+            </button>
+          </Link>
         </motion.div>
         </div>
       </div>

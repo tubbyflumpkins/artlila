@@ -24,16 +24,17 @@ export default function Game() {
   const [timerPaused, setTimerPaused] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(360); // 6 minutes in seconds
   const [timerComplete, setTimerComplete] = useState(false);
+  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
 
   useEffect(() => {
     // Load wheel data from API
-    fetch('/api/wheel-data')
+    fetch(`/api/wheel-data?language=${language}`)
       .then(res => res.json())
       .then(data => setWheelData(data))
       .catch(err => console.error('Échec du chargement des données des roues:', err));
       
     initializeSounds();
-  }, []);
+  }, [language]);
 
 
   useEffect(() => {
@@ -78,6 +79,32 @@ export default function Game() {
     }
   };
 
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'fr' ? 'en' : 'fr');
+    // Reset selections when changing language
+    setSelectedTopic(null);
+    setSelectedConstraint(null);
+  };
+
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle keyboard events if user is typing in an input
+      if ((e.target as HTMLElement).tagName === 'INPUT' || 
+          (e.target as HTMLElement).tagName === 'TEXTAREA') {
+        return;
+      }
+
+      if (e.key === 'l' || e.key === 'L') {
+        e.preventDefault();
+        toggleLanguage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Timer effect
   useEffect(() => {
@@ -110,13 +137,28 @@ export default function Game() {
   if (wheelData.topics.length === 0 || wheelData.constraints.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-cyan-300 flex items-center justify-center">
-        <div className="text-white text-2xl">Chargement des données...</div>
+        <div className="text-white text-2xl">
+          {language === 'fr' ? 'Chargement des données...' : 'Loading data...'}
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-cyan-300 flex flex-col items-center justify-center p-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-cyan-300 flex flex-col items-center justify-center p-8 relative">
+      {/* Language Toggle Button */}
+      <motion.button
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={toggleLanguage}
+        className="absolute top-6 right-6 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 font-semibold text-gray-800 flex items-center gap-2"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <span className={`${language === 'fr' ? 'font-bold' : ''}`}>FR</span>
+        <span className="text-gray-400">|</span>
+        <span className={`${language === 'en' ? 'font-bold' : ''}`}>EN</span>
+      </motion.button>
       <AnimatePresence mode="wait">
         {!timerStarted && (
           <motion.div
@@ -127,7 +169,7 @@ export default function Game() {
             className="text-center mb-12"
           >
             <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
-              Moment Dessin - Sketch Time
+              {language === 'fr' ? 'Moment Dessin' : 'Sketch Time'}
             </h1>
           </motion.div>
         )}
@@ -153,7 +195,7 @@ export default function Game() {
           className="flex flex-col items-center"
         >
           <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            Quoi dessiner? 🤔
+            {language === 'fr' ? 'Quoi dessiner?' : 'What to draw?'} 🤔
           </h2>
           <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
             <SpinningWheel
@@ -189,7 +231,7 @@ export default function Game() {
           className="flex flex-col items-center"
         >
           <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            Comment dessiner? 🎯
+            {language === 'fr' ? 'Comment dessiner?' : 'How to draw?'} 🎯
           </h2>
           <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
             <SpinningWheel
@@ -238,12 +280,15 @@ export default function Game() {
               onClick={togglePause}
             >
               <h2 className="text-6xl font-bold text-gray-800 mb-6">
-                {timerComplete ? "Time's Up! 🎉" : (
-                  <>
-                    {formatTime(timeRemaining)}
-                    {timerPaused && <span className="text-3xl ml-4">⏸️</span>}
-                  </>
-                )}
+                {timerComplete ? 
+                  (language === 'fr' ? "Temps écoulé! 🎉" : "Time's Up! 🎉") : 
+                  (
+                    <>
+                      {formatTime(timeRemaining)}
+                      {timerPaused && <span className="text-3xl ml-4">⏸️</span>}
+                    </>
+                  )
+                }
               </h2>
               {/* Progress Bar */}
               <div 
@@ -268,7 +313,9 @@ export default function Game() {
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-4 text-xl font-medium text-gray-700"
                 >
-                  Great job! Your sketch is complete!
+                  {language === 'fr' ? 
+                    'Excellent travail! Ton dessin est terminé!' : 
+                    'Great job! Your sketch is complete!'}
                 </motion.p>
               )}
             </div>
@@ -286,7 +333,10 @@ export default function Game() {
           onClick={timerStarted ? handleReset : handleStartTimer}
           className="mt-12 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
         >
-          {timerStarted ? 'Reset' : 'Start'} 🎨
+          {timerStarted ? 
+            (language === 'fr' ? 'Réinitialiser' : 'Reset') : 
+            (language === 'fr' ? 'Commencer' : 'Start')
+          } 🎨
         </motion.button>
       )}
 
