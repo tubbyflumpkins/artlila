@@ -166,13 +166,14 @@ const PlinkoBoard: React.FC<PlinkoBoardProps> = ({
       for (let i = 0; i < numSlots; i++) {
         const x = paddingX + i * slotWidth;
         const color = colors[i % colors.length];
-        ctx.fillStyle = color + '40';
+        ctx.fillStyle = color;
         ctx.fillRect(x, height - slotHeight - 5, slotWidth, slotHeight + 5);
 
         // Slot emoji label
-        ctx.font = '20px serif';
+        ctx.font = '24px serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
         ctx.fillText(
           items[i]?.emoji || '',
           x + slotWidth / 2,

@@ -164,11 +164,6 @@ export default function Game() {
 
   const progressPercentage = ((360 - timeRemaining) / 360) * 100;
 
-  const showPrompt = phase === 'ready' || phase === 'left-done';
-  const promptText = language === 'fr'
-    ? (phase === 'ready' ? 'Appuie sur ESPACE pour lancer!' : 'Encore ESPACE pour le 2e!')
-    : (phase === 'ready' ? 'Press SPACE to drop!' : 'SPACE again for the 2nd!');
-
   if (topicSubset.length === 0 || constraintSubset.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-cyan-300 flex items-center justify-center">
@@ -208,27 +203,6 @@ export default function Game() {
             <h1 className="text-5xl font-bold text-white drop-shadow-lg">
               {language === 'fr' ? 'Moment Dessin' : 'Sketch Time'}
             </h1>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Spacebar Prompt */}
-      <AnimatePresence>
-        {showPrompt && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="mb-4"
-          >
-            <motion.button
-              onClick={handleDrop}
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
-            >
-              {promptText}
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
