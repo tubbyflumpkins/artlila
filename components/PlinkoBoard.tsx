@@ -19,6 +19,7 @@ interface PlinkoBoardProps {
   onResult: (item: WheelSegment) => void;
   dropBall: boolean;
   onBallDropped: () => void;
+  onCanvasClick?: () => void;
 }
 
 const PlinkoBoard: React.FC<PlinkoBoardProps> = ({
@@ -28,6 +29,7 @@ const PlinkoBoard: React.FC<PlinkoBoardProps> = ({
   onResult,
   dropBall,
   onBallDropped,
+  onCanvasClick,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
@@ -37,6 +39,9 @@ const PlinkoBoard: React.FC<PlinkoBoardProps> = ({
   const hasSettledRef = useRef(false);
   const dropTimeRef = useRef<number>(0);
   const lastBounceTimeRef = useRef<number>(0);
+  const doDropRef = useRef<() => void>(() => {});
+  const dropBallRef = useRef(dropBall);
+  dropBallRef.current = dropBall;
   const [result, setResult] = useState<WheelSegment | null>(null);
 
   const { width, height, pegRadius, ballRadius, slotHeight, paddingX, paddingTop, numSlots, wallThickness, dividerWidth, dividerHeight } = BOARD_CONFIG;
@@ -275,20 +280,30 @@ const PlinkoBoard: React.FC<PlinkoBoardProps> = ({
     onBallDropped();
   }, [width, paddingX, paddingTop, ballRadius, onBallDropped]);
 
+  doDropRef.current = doDrop;
+
   useEffect(() => {
     if (dropBall && !hasDroppedRef.current) {
       doDrop();
     }
   }, [dropBall, doDrop]);
 
-  // Reset when items change (new round)
+  // Reset when items change (new round / redo)
   useEffect(() => {
-    hasDroppedRef.current = false;
-    hasSettledRef.current = false;
-    setResult(null);
     if (ballRef.current && engineRef.current) {
       Matter.Composite.remove(engineRef.current.world, ballRef.current);
       ballRef.current = null;
+    }
+    hasDroppedRef.current = false;
+    hasSettledRef.current = false;
+    setResult(null);
+
+    // Auto-redrop if this board was already active
+    if (dropBallRef.current) {
+      const timer = setTimeout(() => {
+        doDropRef.current();
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [items]);
 
@@ -296,7 +311,8 @@ const PlinkoBoard: React.FC<PlinkoBoardProps> = ({
     <div className="flex flex-col items-center">
       <canvas
         ref={canvasRef}
-        style={{ width: `${width}px`, height: `${height}px` }}
+        onClick={onCanvasClick}
+        style={{ width: `${width}px`, height: `${height}px`, cursor: 'pointer' }}
         className="rounded-2xl shadow-2xl"
       />
       <AnimatePresence mode="wait">

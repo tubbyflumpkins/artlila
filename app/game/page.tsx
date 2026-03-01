@@ -61,7 +61,11 @@ export default function Game() {
 
   const handleTopicResult = useCallback((item: WheelSegment) => {
     setSelectedTopic(item);
-    setPhase('left-done');
+    setPhase(prev => {
+      // If constraint side is already done (redo case), stay in both-done
+      if (prev === 'both-done' || prev === 'dropping-right') return prev;
+      return 'left-done';
+    });
   }, []);
 
   const handleConstraintResult = useCallback((item: WheelSegment) => {
@@ -69,13 +73,8 @@ export default function Game() {
     setPhase('both-done');
   }, []);
 
-  const handleLeftBallDropped = useCallback(() => {
-    // Ball has been created and added to the world
-  }, []);
-
-  const handleRightBallDropped = useCallback(() => {
-    // Ball has been created and added to the world
-  }, []);
+  const handleLeftBallDropped = useCallback(() => {}, []);
+  const handleRightBallDropped = useCallback(() => {}, []);
 
   const handleDrop = useCallback(() => {
     if (phase === 'ready') {
@@ -84,6 +83,24 @@ export default function Game() {
       setPhase('dropping-right');
     }
   }, [phase]);
+
+  const handleClickLeft = useCallback(() => {
+    if (phase === 'ready') {
+      setPhase('dropping-left');
+    } else if (phase !== 'dropping-left') {
+      setSelectedTopic(null);
+      setTopicSubset(selectRandomSubset(wheelData.topics, 10));
+    }
+  }, [phase, wheelData.topics]);
+
+  const handleClickRight = useCallback(() => {
+    if (phase === 'left-done') {
+      setPhase('dropping-right');
+    } else if (phase === 'both-done') {
+      setSelectedConstraint(null);
+      setConstraintSubset(selectRandomSubset(wheelData.constraints, 10));
+    }
+  }, [phase, wheelData.constraints]);
 
   const handleReset = () => {
     setSelectedTopic(null);
@@ -232,6 +249,7 @@ export default function Game() {
             onResult={handleTopicResult}
             dropBall={phase === 'dropping-left' || phase === 'left-done' || phase === 'dropping-right' || phase === 'both-done'}
             onBallDropped={handleLeftBallDropped}
+            onCanvasClick={handleClickLeft}
           />
         </motion.div>
 
@@ -251,6 +269,7 @@ export default function Game() {
             onResult={handleConstraintResult}
             dropBall={phase === 'dropping-right' || phase === 'both-done'}
             onBallDropped={handleRightBallDropped}
+            onCanvasClick={handleClickRight}
           />
         </motion.div>
       </motion.div>
