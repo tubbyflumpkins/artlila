@@ -103,6 +103,7 @@ export const animationFlipbook: Presentation = {
             en: 'Andy Bailey is a professional animator who makes incredible flipbooks.',
           },
           url: 'https://youtu.be/Un-BdBSOGKY',
+          embed: true,
           emoji: '📖',
         },
       },
