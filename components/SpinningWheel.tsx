@@ -37,6 +37,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 }, ref) => {
   const [rotation, setRotation] = useState(0);
   const [colorOffset, setColorOffset] = useState(0);
+  const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
   const colorIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastTickRef = useRef(0);
   const lastSoundTimeRef = useRef(0);
@@ -44,9 +45,9 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
   const startRotationRef = useRef(0);
   const endRotationRef = useRef(0);
 
-  // Animated chasing colors: cycle offset while not spinning, freeze when spinning
+  // Animated chasing colors: cycle while idle (no winner, not spinning), freeze otherwise
   useEffect(() => {
-    if (!isSpinning) {
+    if (!isSpinning && winnerIndex === null) {
       colorIntervalRef.current = setInterval(() => {
         setColorOffset(prev => prev + 1);
       }, 150);
@@ -59,9 +60,14 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
     return () => {
       if (colorIntervalRef.current) clearInterval(colorIntervalRef.current);
     };
-  }, [isSpinning]);
+  }, [isSpinning, winnerIndex]);
 
   const getSegmentColor = (index: number) => {
+    if (winnerIndex !== null) {
+      // After spin: winner is red, everything else cream
+      return index === winnerIndex ? '#DC2626' : '#FEF3E2';
+    }
+    // Before/during spin: chasing animation (frozen when spinning)
     return CHASE_COLORS[(index + colorOffset) % CHASE_COLORS.length];
   };
 
@@ -115,6 +121,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
     if (isSpinning) return;
 
     setIsSpinning(true);
+    setWinnerIndex(null);
 
     const spins = 5 + Math.random() * 3;
     const currentRotation = rotationRef.current;
@@ -158,9 +165,10 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
       onComplete: () => {
         const normalizedRotation = finalRotation % 360;
         const topAngle = (270 - normalizedRotation + 360) % 360;
-        const winningIndex = Math.floor(topAngle / segmentAngle) % segments.length;
-        const winner = segments[winningIndex];
+        const winIdx = Math.floor(topAngle / segmentAngle) % segments.length;
+        const winner = segments[winIdx];
 
+        setWinnerIndex(winIdx);
         setTimeout(() => {
           onSpinComplete(winner);
           setIsSpinning(false);

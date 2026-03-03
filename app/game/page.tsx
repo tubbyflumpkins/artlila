@@ -26,6 +26,8 @@ export default function Game() {
 
   const topicWheelRef = useRef<SpinningWheelHandle>(null);
   const constraintWheelRef = useRef<SpinningWheelHandle>(null);
+  const leftRainRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rightRainRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetch('/api/wheel-data')
@@ -40,62 +42,48 @@ export default function Game() {
     return () => document.body.classList.remove('game-page');
   }, []);
 
-  // Emoji confetti helper - dramatic multi-burst
-  const fireEmojiConfetti = (emoji: string, originX: number) => {
-    const scalar = 3;
+  // Emoji rain - gentle falling emoji behind the wheel
+  const startEmojiRain = (emoji: string, side: 'left' | 'right') => {
+    const ref = side === 'left' ? leftRainRef : rightRainRef;
+    if (ref.current) clearInterval(ref.current);
+
+    const scalar = 2.5;
     const shape = confetti.shapeFromText({ text: emoji, scalar });
+    const baseX = side === 'left' ? 0.25 : 0.75;
 
-    // Big center burst
-    confetti({
-      particleCount: 60,
-      spread: 120,
-      origin: { x: originX, y: 0.5 },
-      shapes: [shape],
-      scalar,
-      ticks: 100,
-      gravity: 0.6,
-      startVelocity: 45,
-    });
-
-    // Staggered second burst - upward
-    setTimeout(() => {
+    let count = 0;
+    ref.current = setInterval(() => {
       confetti({
-        particleCount: 40,
-        spread: 90,
-        origin: { x: originX, y: 0.55 },
+        particleCount: 3,
+        angle: 90,
+        spread: 35,
+        origin: { x: baseX + (Math.random() - 0.5) * 0.2, y: -0.05 },
         shapes: [shape],
         scalar,
-        ticks: 100,
-        gravity: 0.5,
-        startVelocity: 35,
+        flat: true,
+        gravity: 1,
+        startVelocity: 8,
+        ticks: 200,
+        drift: (Math.random() - 0.5) * 0.3,
       });
-    }, 150);
-
-    // Third burst - wide scatter
-    setTimeout(() => {
-      confetti({
-        particleCount: 30,
-        spread: 160,
-        origin: { x: originX, y: 0.45 },
-        shapes: [shape],
-        scalar: scalar * 0.8,
-        ticks: 80,
-        gravity: 0.7,
-        startVelocity: 25,
-      });
-    }, 350);
+      count++;
+      if (count >= 25) {
+        clearInterval(ref.current!);
+        ref.current = null;
+      }
+    }, 200);
   };
 
   const handleTopicComplete = (result: WheelSegment) => {
     setSelectedTopic(result);
     playCelebration();
-    fireEmojiConfetti(result.emoji, 0.3);
+    startEmojiRain(result.emoji, 'left');
   };
 
   const handleConstraintComplete = (result: WheelSegment) => {
     setSelectedConstraint(result);
     playCelebration();
-    fireEmojiConfetti(result.emoji, 0.7);
+    startEmojiRain(result.emoji, 'right');
   };
 
   const handleReset = () => {
@@ -105,6 +93,8 @@ export default function Game() {
     setTimerPaused(false);
     setTimeRemaining(300);
     setTimerComplete(false);
+    if (leftRainRef.current) { clearInterval(leftRainRef.current); leftRainRef.current = null; }
+    if (rightRainRef.current) { clearInterval(rightRainRef.current); rightRainRef.current = null; }
   };
 
   const handleStartTimer = () => {
