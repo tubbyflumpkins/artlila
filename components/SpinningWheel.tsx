@@ -16,11 +16,13 @@ export interface SpinningWheelHandle {
 
 interface SpinningWheelProps {
   segments: WheelSegment[];
-  colors: string[];
   onSpinComplete: (result: WheelSegment) => void;
   isSpinning: boolean;
   setIsSpinning: (spinning: boolean) => void;
 }
+
+// Chasing color pattern: red, cream, cream - creates a rotating ring effect
+const CHASE_COLORS = ['#DC2626', '#FEF3E2', '#FEF3E2'];
 
 // Flapper spring physics constants
 const SPRING_STIFFNESS = 0.3;
@@ -29,17 +31,39 @@ const MAX_DEFLECTION = 35; // degrees
 
 const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
   segments,
-  colors,
   onSpinComplete,
   isSpinning,
   setIsSpinning
 }, ref) => {
   const [rotation, setRotation] = useState(0);
+  const [colorOffset, setColorOffset] = useState(0);
+  const colorIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastTickRef = useRef(0);
   const lastSoundTimeRef = useRef(0);
   const rotationRef = useRef(0);
   const startRotationRef = useRef(0);
   const endRotationRef = useRef(0);
+
+  // Animated chasing colors: cycle offset while not spinning, freeze when spinning
+  useEffect(() => {
+    if (!isSpinning) {
+      colorIntervalRef.current = setInterval(() => {
+        setColorOffset(prev => prev + 1);
+      }, 150);
+    } else {
+      if (colorIntervalRef.current) {
+        clearInterval(colorIntervalRef.current);
+        colorIntervalRef.current = null;
+      }
+    }
+    return () => {
+      if (colorIntervalRef.current) clearInterval(colorIntervalRef.current);
+    };
+  }, [isSpinning]);
+
+  const getSegmentColor = (index: number) => {
+    return CHASE_COLORS[(index + colorOffset) % CHASE_COLORS.length];
+  };
 
   // Flapper physics refs
   const flapperRef = useRef<SVGGElement>(null);
@@ -215,7 +239,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
             {segments.map((segment, index) => {
               const startAngle = index * segmentAngle;
               const endAngle = (index + 1) * segmentAngle;
-              const color = colors[index % colors.length];
+              const color = getSegmentColor(index);
 
               const startAngleRad = (startAngle * Math.PI) / 180;
               const endAngleRad = (endAngle * Math.PI) / 180;

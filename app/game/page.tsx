@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SpinningWheel, { SpinningWheelHandle } from '@/components/SpinningWheel';
 import EditButton from '@/components/EditButton';
-import { wheelColors } from '@/lib/wheelData';
 import { initializeAudio, playCelebration, playTimerEnd } from '@/lib/sounds';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -35,6 +34,10 @@ export default function Game() {
       .catch(err => console.error('Échec du chargement des données des roues:', err));
 
     initializeAudio();
+
+    // Invert logo for dark background
+    document.body.classList.add('game-page');
+    return () => document.body.classList.remove('game-page');
   }, []);
 
   // Emoji confetti helper - dramatic multi-burst
@@ -187,41 +190,56 @@ export default function Game() {
       {/* Dynamic floating color blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
+          className="absolute w-[600px] h-[600px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #a855f7, transparent 70%)',
+            background: 'radial-gradient(circle, #a855f7, transparent 60%)',
+            filter: 'blur(80px)',
+            opacity: 0.35,
             animation: 'floatBlob1 20s ease-in-out infinite',
           }}
         />
         <div
-          className="absolute w-[400px] h-[400px] rounded-full blur-[100px] opacity-15"
+          className="absolute w-[500px] h-[500px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #3b82f6, transparent 70%)',
+            background: 'radial-gradient(circle, #3b82f6, transparent 60%)',
+            filter: 'blur(70px)',
+            opacity: 0.3,
             animation: 'floatBlob2 25s ease-in-out infinite',
           }}
         />
         <div
-          className="absolute w-[450px] h-[450px] rounded-full blur-[110px] opacity-15"
+          className="absolute w-[550px] h-[550px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #ec4899, transparent 70%)',
+            background: 'radial-gradient(circle, #ec4899, transparent 60%)',
+            filter: 'blur(75px)',
+            opacity: 0.3,
             animation: 'floatBlob3 22s ease-in-out infinite',
           }}
         />
         <div
-          className="absolute w-[350px] h-[350px] rounded-full blur-[90px] opacity-12"
+          className="absolute w-[450px] h-[450px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #f59e0b, transparent 70%)',
+            background: 'radial-gradient(circle, #f59e0b, transparent 60%)',
+            filter: 'blur(65px)',
+            opacity: 0.25,
             animation: 'floatBlob4 18s ease-in-out infinite',
           }}
         />
         <div
-          className="absolute w-[300px] h-[300px] rounded-full blur-[80px] opacity-10"
+          className="absolute w-[400px] h-[400px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #10b981, transparent 70%)',
+            background: 'radial-gradient(circle, #10b981, transparent 60%)',
+            filter: 'blur(60px)',
+            opacity: 0.25,
             animation: 'floatBlob5 24s ease-in-out infinite',
           }}
         />
       </div>
+      <style jsx global>{`
+        body.game-page header img {
+          filter: invert(1) brightness(2);
+        }
+      `}</style>
       <style jsx>{`
         @keyframes floatBlob1 {
           0%, 100% { top: 10%; left: 15%; }
@@ -305,7 +323,6 @@ export default function Game() {
           <SpinningWheel
             ref={topicWheelRef}
             segments={wheelData.topics}
-            colors={wheelColors}
             onSpinComplete={handleTopicComplete}
             isSpinning={isSpinningTopic}
             setIsSpinning={setIsSpinningTopic}
@@ -347,7 +364,6 @@ export default function Game() {
           <SpinningWheel
             ref={constraintWheelRef}
             segments={wheelData.constraints}
-            colors={wheelColors.slice().reverse()}
             onSpinComplete={handleConstraintComplete}
             isSpinning={isSpinningConstraint}
             setIsSpinning={setIsSpinningConstraint}
