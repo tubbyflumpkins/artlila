@@ -72,7 +72,7 @@ export default function Game() {
     const ref = side === 'left' ? leftRainRef : rightRainRef;
     if (ref.current) clearInterval(ref.current);
 
-    const scalar = 2.5;
+    const scalar = 7.5;
     const shape = confetti.shapeFromText({ text: emoji, scalar });
     const baseX = side === 'left' ? 0.25 : 0.75;
 
@@ -86,9 +86,9 @@ export default function Game() {
         shapes: [shape],
         scalar,
         flat: true,
-        gravity: 0.6,
-        startVelocity: 12,
-        ticks: 400,
+        gravity: 0.4,
+        startVelocity: 15,
+        ticks: 800,
         drift: (Math.random() - 0.5) * 0.3,
         zIndex: 5,
       });

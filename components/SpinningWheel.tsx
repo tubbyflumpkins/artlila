@@ -38,72 +38,41 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 }, ref) => {
   const [rotation, setRotation] = useState(0);
   const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
-  const [revealStep, setRevealStep] = useState<number | null>(null);
-  const revealTargetRef = useRef<number>(0);
   const lastTickRef = useRef(0);
   const lastSoundTimeRef = useRef(0);
   const rotationRef = useRef(0);
   const startRotationRef = useRef(0);
   const endRotationRef = useRef(0);
 
-  // Winner reveal scan: sweep red highlight around wheel then land on winner
-  useEffect(() => {
-    if (revealStep === null) return;
-    const totalSteps = segments.length + revealTargetRef.current;
-    if (revealStep >= totalSteps) {
-      // Scan complete — lock winner and notify parent
-      setRevealStep(null);
-      setWinnerIndex(revealTargetRef.current);
-      const winner = segments[revealTargetRef.current];
-      setTimeout(() => {
-        onSpinComplete(winner);
-        setIsSpinning(false);
-      }, 300);
-      return;
-    }
-    const timer = setTimeout(() => {
-      setRevealStep(prev => (prev !== null ? prev + 1 : null));
-    }, 60);
-    return () => clearTimeout(timer);
-  }, [revealStep, segments, onSpinComplete, setIsSpinning]);
-
   const getSegmentColor = (index: number) => {
     const n = segments.length;
 
-    // 1. Reveal scan in progress
-    if (revealStep !== null) {
-      const scanPos = revealStep % n;
-      return scanPos === index ? '#DC2626' : '#FEF3E2';
-    }
-
-    // 2. Post-reveal: winner red, rest cream
+    // Post-spin: winner red, neighbors pink, rest cream
     if (winnerIndex !== null) {
-      return index === winnerIndex ? '#DC2626' : '#FEF3E2';
+      if (index === winnerIndex) return '#DC2626';
+      const prev = (winnerIndex - 1 + n) % n;
+      const next = (winnerIndex + 1) % n;
+      if (index === prev || index === next) return '#FCA5A5';
+      return '#FEF3E2';
     }
 
     // 3. Festive patterns (driven by parent tick + patternIndex)
     const tick = animationTick;
-    const pattern = patternIndex % 4;
+    const pattern = patternIndex % 2;
 
-    switch (pattern) {
-      case 0: // Rainbow wave
-        return `hsl(${(index * 360 / n + tick * 8) % 360}, 80%, 55%)`;
-      case 1: // Red/cream chase (original pattern)
-        return ['#DC2626', '#FEF3E2', '#FEF3E2'][(index + tick) % 3];
-      case 2: // Amber/purple checkerboard that swaps each tick
-        return (index + tick) % 2 === 0 ? '#F59E0B' : '#8B5CF6';
-      case 3: { // Dual sweep — two red highlights chase in opposite directions
-        const pos1 = tick % n;
-        const pos2 = (n - 1 - (tick % n)) % n;
-        if (index === pos1 || index === pos2) return '#DC2626';
-        // Trailing glow
-        const prev1 = (pos1 - 1 + n) % n;
-        const prev2 = (pos2 - 1 + n) % n;
-        if (index === prev1 || index === prev2) return '#FCA5A5';
-        return '#FEF3E2';
-      }
-      default:
-        return '#FEF3E2';
+    if (pattern === 0) {
+      // Red/cream chase (original pattern)
+      return ['#DC2626', '#FEF3E2', '#FEF3E2'][(index + tick) % 3];
+    } else {
+      // Dual sweep — two red highlights chase in opposite directions
+      const pos1 = tick % n;
+      const pos2 = (n - 1 - (tick % n)) % n;
+      if (index === pos1 || index === pos2) return '#DC2626';
+      // Trailing glow
+      const prev1 = (pos1 - 1 + n) % n;
+      const prev2 = (pos2 - 1 + n) % n;
+      if (index === prev1 || index === prev2) return '#FCA5A5';
+      return '#FEF3E2';
     }
   };
 
@@ -158,7 +127,6 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 
     setIsSpinning(true);
     setWinnerIndex(null);
-    setRevealStep(null);
 
     const spins = 5 + Math.random() * 3;
     const currentRotation = rotationRef.current;
@@ -204,9 +172,11 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
         const topAngle = (270 - normalizedRotation + 360) % 360;
         const winIdx = Math.floor(topAngle / segmentAngle) % segments.length;
 
-        // Start reveal scan instead of immediately showing winner
-        revealTargetRef.current = winIdx;
-        setRevealStep(0);
+        setWinnerIndex(winIdx);
+        setTimeout(() => {
+          onSpinComplete(segments[winIdx]);
+          setIsSpinning(false);
+        }, 500);
       }
     });
   }, [isSpinning, setIsSpinning, segments, segmentAngle, numberOfPegs, onSpinComplete, updateFlapper]);
@@ -253,24 +223,8 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
           whileHover={{ scale: isSpinning ? 1 : 1.02 }}
           whileTap={{ scale: isSpinning ? 1 : 0.98 }}
         >
-          <svg viewBox="0 0 400 400" className="w-full h-full">
-            {/* Outer decorative gold ring */}
-            <circle
-              cx="200" cy="200" r="192"
-              fill="none"
-              stroke="#FFD700"
-              strokeWidth="6"
-              filter="url(#goldGlow)"
-            />
-
+          <svg viewBox="0 0 400 400" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 12px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 30px rgba(255, 215, 0, 0.15))' }}>
             <defs>
-              <filter id="goldGlow">
-                <feGaussianBlur stdDeviation="2" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
               <radialGradient id="hubGradient" cx="50%" cy="40%" r="50%">
                 <stop offset="0%" stopColor="#FFE066" />
                 <stop offset="100%" stopColor="#FFD700" />
@@ -293,11 +247,6 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 
               const largeArc = segmentAngle > 180 ? 1 : 0;
 
-              // Peg position at outer edge
-              const pegAngleRad = (startAngle * Math.PI) / 180;
-              const pegX = Math.round((200 + 185 * Math.cos(pegAngleRad)) * 100) / 100;
-              const pegY = Math.round((200 + 185 * Math.sin(pegAngleRad)) * 100) / 100;
-
               return (
                 <g key={segment.id}>
                   <path
@@ -305,16 +254,6 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
                     fill={color}
                     stroke="#fff"
                     strokeWidth="1.5"
-                  />
-
-                  {/* Gold peg at segment boundary */}
-                  <circle
-                    cx={pegX}
-                    cy={pegY}
-                    r="6"
-                    fill="#FFD700"
-                    stroke="#B8860B"
-                    strokeWidth="1"
                   />
 
                   {/* Emoji */}
