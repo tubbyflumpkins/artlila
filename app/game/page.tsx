@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import SpinningWheel from '@/components/SpinningWheel';
+import React, { useState, useEffect, useRef } from 'react';
+import SpinningWheel, { SpinningWheelHandle } from '@/components/SpinningWheel';
 import EditButton from '@/components/EditButton';
 import { wheelColors } from '@/lib/wheelData';
-import { initializeSounds, playCelebration } from '@/lib/sounds';
+import { initializeAudio, playCelebration, playTimerEnd } from '@/lib/sounds';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
@@ -22,39 +22,63 @@ export default function Game() {
   const [wheelData, setWheelData] = useState<{ topics: WheelSegment[], constraints: WheelSegment[] }>({ topics: [], constraints: [] });
   const [timerStarted, setTimerStarted] = useState(false);
   const [timerPaused, setTimerPaused] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(360); // 6 minutes in seconds
+  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes
   const [timerComplete, setTimerComplete] = useState(false);
-  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
+
+  const topicWheelRef = useRef<SpinningWheelHandle>(null);
+  const constraintWheelRef = useRef<SpinningWheelHandle>(null);
 
   useEffect(() => {
-    // Load wheel data from API
-    fetch(`/api/wheel-data?language=${language}`)
+    fetch('/api/wheel-data')
       .then(res => res.json())
       .then(data => setWheelData(data))
       .catch(err => console.error('Échec du chargement des données des roues:', err));
-      
-    initializeSounds();
-  }, [language]);
 
+    initializeAudio();
+  }, []);
 
-  useEffect(() => {
-    if (selectedTopic && selectedConstraint && !isSpinningTopic && !isSpinningConstraint) {
-      playCelebration();
+  // Emoji confetti helper
+  const fireEmojiConfetti = (emoji: string, originX: number) => {
+    const scalar = 2;
+    const shape = confetti.shapeFromText({ text: emoji, scalar });
+
+    // First burst
+    confetti({
+      particleCount: 40,
+      spread: 80,
+      origin: { x: originX, y: 0.5 },
+      shapes: [shape],
+      scalar,
+      ticks: 60,
+      gravity: 0.8,
+      startVelocity: 30,
+    });
+
+    // Staggered second burst
+    setTimeout(() => {
       confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3']
+        particleCount: 30,
+        spread: 60,
+        origin: { x: originX, y: 0.45 },
+        shapes: [shape],
+        scalar,
+        ticks: 60,
+        gravity: 0.8,
+        startVelocity: 25,
       });
-    }
-  }, [selectedTopic, selectedConstraint, isSpinningTopic, isSpinningConstraint]);
+    }, 150);
+  };
 
   const handleTopicComplete = (result: WheelSegment) => {
     setSelectedTopic(result);
+    playCelebration();
+    fireEmojiConfetti(result.emoji, 0.3);
   };
 
   const handleConstraintComplete = (result: WheelSegment) => {
     setSelectedConstraint(result);
+    playCelebration();
+    fireEmojiConfetti(result.emoji, 0.7);
   };
 
   const handleReset = () => {
@@ -62,14 +86,14 @@ export default function Game() {
     setSelectedConstraint(null);
     setTimerStarted(false);
     setTimerPaused(false);
-    setTimeRemaining(360);
+    setTimeRemaining(300);
     setTimerComplete(false);
   };
 
   const handleStartTimer = () => {
     setTimerStarted(true);
     setTimerPaused(false);
-    setTimeRemaining(360);
+    setTimeRemaining(300);
     setTimerComplete(false);
   };
 
@@ -79,26 +103,20 @@ export default function Game() {
     }
   };
 
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'fr' ? 'en' : 'fr');
-    // Reset selections when changing language
-    setSelectedTopic(null);
-    setSelectedConstraint(null);
-  };
-
-
-  // Keyboard navigation
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't handle keyboard events if user is typing in an input
-      if ((e.target as HTMLElement).tagName === 'INPUT' || 
+      if ((e.target as HTMLElement).tagName === 'INPUT' ||
           (e.target as HTMLElement).tagName === 'TEXTAREA') {
         return;
       }
 
-      if (e.key === 'l' || e.key === 'L') {
+      if (e.key === '1') {
         e.preventDefault();
-        toggleLanguage();
+        topicWheelRef.current?.spin();
+      } else if (e.key === '2') {
+        e.preventDefault();
+        constraintWheelRef.current?.spin();
       }
     };
 
@@ -115,6 +133,7 @@ export default function Game() {
             setTimerComplete(true);
             setTimerStarted(false);
             setTimerPaused(false);
+            playTimerEnd();
             return 0;
           }
           return prev - 1;
@@ -124,41 +143,39 @@ export default function Game() {
     }
   }, [timerStarted, timerPaused]);
 
-  // Format time for display
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Calculate progress percentage
-  const progressPercentage = ((360 - timeRemaining) / 360) * 100;
+  const progressPercentage = ((300 - timeRemaining) / 300) * 100;
+
+  // Progress bar color: green -> yellow -> red
+  const getProgressColor = () => {
+    if (timerComplete) return 'from-green-400 to-green-500';
+    if (timerPaused) return 'from-yellow-400 to-orange-500';
+    if (progressPercentage < 50) return 'from-green-400 to-emerald-500';
+    if (progressPercentage < 80) return 'from-yellow-400 to-amber-500';
+    return 'from-orange-500 to-red-500';
+  };
 
   if (wheelData.topics.length === 0 || wheelData.constraints.length === 0) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-cyan-300 flex items-center justify-center">
-        <div className="text-white text-2xl">
-          {language === 'fr' ? 'Chargement des données...' : 'Loading data...'}
-        </div>
+      <main className="min-h-screen bg-[radial-gradient(ellipse_at_center,#1a0a3e,#0a0a2e)] flex items-center justify-center">
+        <div className="text-amber-100 text-2xl">Chargement des données...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-300 to-cyan-300 flex flex-col items-center justify-center p-8 relative">
-      {/* Language Toggle Button */}
-      <motion.button
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        onClick={toggleLanguage}
-        className="absolute top-6 right-6 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 font-semibold text-gray-800 flex items-center gap-2"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <span className={`${language === 'fr' ? 'font-bold' : ''}`}>FR</span>
-        <span className="text-gray-400">|</span>
-        <span className={`${language === 'en' ? 'font-bold' : ''}`}>EN</span>
-      </motion.button>
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_center,#1a0a3e,#0a0a2e)] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle ambient glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+      </div>
+
       <AnimatePresence mode="wait">
         {!timerStarted && (
           <motion.div
@@ -166,94 +183,111 @@ export default function Game() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -50, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="text-center mb-12"
+            className="text-center mb-6 relative z-10"
           >
-            <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
-              {language === 'fr' ? 'Moment Dessin' : 'Sketch Time'}
+            <h1
+              className="text-6xl font-bold mb-2"
+              style={{
+                color: '#FFECD2',
+                textShadow: '0 0 40px rgba(255, 215, 0, 0.3), 0 2px 8px rgba(0,0,0,0.5)'
+              }}
+            >
+              Moment Dessin
             </h1>
           </motion.div>
         )}
       </AnimatePresence>
 
-
-      <motion.div 
-        animate={{ 
-          y: timerStarted ? -30 : 0,
+      <motion.div
+        animate={{
+          y: timerStarted ? -20 : 0,
           scale: timerStarted ? 0.95 : 1
         }}
-        transition={{ 
-          duration: 0.3, 
+        transition={{
+          duration: 0.3,
           ease: "easeInOut",
           scale: { duration: 0.2 }
         }}
-        className="flex flex-col lg:flex-row gap-12 items-center justify-center"
+        className="flex flex-col lg:flex-row gap-8 items-center justify-center relative z-10"
       >
+        {/* Topic Wheel */}
         <motion.div
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="flex flex-col items-center"
         >
-          <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            {language === 'fr' ? 'Quoi dessiner?' : 'What to draw?'} 🤔
+          <h2
+            className="text-2xl font-bold mb-4"
+            style={{ color: '#FFECD2', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+          >
+            Quoi dessiner? 🤔
           </h2>
-          <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
-            <SpinningWheel
-              segments={wheelData.topics}
-              colors={wheelColors}
-              onSpinComplete={handleTopicComplete}
-              isSpinning={isSpinningTopic}
-              setIsSpinning={setIsSpinningTopic}
-            />
-          </div>
-          
+          <SpinningWheel
+            ref={topicWheelRef}
+            segments={wheelData.topics}
+            colors={wheelColors}
+            onSpinComplete={handleTopicComplete}
+            isSpinning={isSpinningTopic}
+            setIsSpinning={setIsSpinningTopic}
+          />
+
           <AnimatePresence mode="wait">
             {selectedTopic && (
               <motion.div
                 key={selectedTopic.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="mt-6 bg-white/90 rounded-2xl p-4 shadow-lg"
+                initial={{ opacity: 0, scale: 0.3, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.3, y: -20 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="mt-4 bg-gray-900/80 border-2 border-yellow-400/50 rounded-2xl px-6 py-3"
+                style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.15)' }}
               >
-                <p className="text-2xl font-bold text-gray-800">
-                  {selectedTopic.emoji} {selectedTopic.text}
+                <p className="text-2xl font-bold text-white">
+                  <span className="text-3xl mr-2">{selectedTopic.emoji}</span>
+                  {selectedTopic.text}
                 </p>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
 
+        {/* Constraint Wheel */}
         <motion.div
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="flex flex-col items-center"
         >
-          <h2 className="text-3xl font-bold text-white mb-6 drop-shadow-lg">
-            {language === 'fr' ? 'Comment dessiner?' : 'How to draw?'} 🎯
+          <h2
+            className="text-2xl font-bold mb-4"
+            style={{ color: '#FFECD2', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+          >
+            Comment dessiner? 🎯
           </h2>
-          <div className="bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-2xl">
-            <SpinningWheel
-              segments={wheelData.constraints}
-              colors={wheelColors.slice().reverse()}
-              onSpinComplete={handleConstraintComplete}
-              isSpinning={isSpinningConstraint}
-              setIsSpinning={setIsSpinningConstraint}
-            />
-          </div>
-          
+          <SpinningWheel
+            ref={constraintWheelRef}
+            segments={wheelData.constraints}
+            colors={wheelColors.slice().reverse()}
+            onSpinComplete={handleConstraintComplete}
+            isSpinning={isSpinningConstraint}
+            setIsSpinning={setIsSpinningConstraint}
+          />
+
           <AnimatePresence mode="wait">
             {selectedConstraint && (
               <motion.div
                 key={selectedConstraint.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="mt-6 bg-white/90 rounded-2xl p-4 shadow-lg"
+                initial={{ opacity: 0, scale: 0.3, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.3, y: -20 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                className="mt-4 bg-gray-900/80 border-2 border-yellow-400/50 rounded-2xl px-6 py-3"
+                style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.15)' }}
               >
-                <p className="text-2xl font-bold text-gray-800">
-                  {selectedConstraint.emoji} {selectedConstraint.text}
+                <p className="text-2xl font-bold text-white">
+                  <span className="text-3xl mr-2">{selectedConstraint.emoji}</span>
+                  {selectedConstraint.text}
                 </p>
               </motion.div>
             )}
@@ -268,20 +302,25 @@ export default function Game() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ 
-              duration: 0.3, 
-              ease: "easeOut",
-              delay: 0.1
-            }}
-            className="mt-2 mb-4 text-center"
+            transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+            className="mt-4 mb-2 text-center relative z-10"
           >
-            <div 
-              className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl cursor-pointer"
+            <div
+              className="bg-gray-900/80 border-2 border-yellow-400/30 rounded-3xl p-8 cursor-pointer"
+              style={{ boxShadow: '0 0 30px rgba(255, 215, 0, 0.1)' }}
               onClick={togglePause}
             >
-              <h2 className="text-6xl font-bold text-gray-800 mb-6">
-                {timerComplete ? 
-                  (language === 'fr' ? "Temps écoulé! 🎉" : "Time's Up! 🎉") : 
+              <h2
+                className="text-6xl font-bold mb-6"
+                style={{
+                  color: timerComplete ? '#4ADE80' : '#FFECD2',
+                  textShadow: timerComplete
+                    ? '0 0 20px rgba(74, 222, 128, 0.5)'
+                    : '0 0 20px rgba(255, 215, 0, 0.3)'
+                }}
+              >
+                {timerComplete ?
+                  "Temps écoulé! 🎉" :
                   (
                     <>
                       {formatTime(timeRemaining)}
@@ -291,31 +330,21 @@ export default function Game() {
                 }
               </h2>
               {/* Progress Bar */}
-              <div 
-                className="w-96 h-6 bg-gray-200 rounded-full overflow-hidden"
-              >
+              <div className="w-96 h-6 bg-gray-800 rounded-full overflow-hidden border border-yellow-400/30">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
                   transition={{ duration: 0.5, ease: "linear" }}
-                  className={`h-full ${
-                    timerComplete 
-                      ? 'bg-gradient-to-r from-green-400 to-green-500' 
-                      : timerPaused
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
-                      : 'bg-gradient-to-r from-blue-400 to-purple-500'
-                  }`}
+                  className={`h-full bg-gradient-to-r ${getProgressColor()}`}
                 />
               </div>
               {timerComplete && (
                 <motion.p
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 text-xl font-medium text-gray-700"
+                  className="mt-4 text-xl font-medium text-amber-100/80"
                 >
-                  {language === 'fr' ? 
-                    'Excellent travail! Ton dessin est terminé!' : 
-                    'Great job! Your sketch is complete!'}
+                  Excellent travail! Ton dessin est terminé!
                 </motion.p>
               )}
             </div>
@@ -331,12 +360,9 @@ export default function Game() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={timerStarted ? handleReset : handleStartTimer}
-          className="mt-12 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+          className="mt-8 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow relative z-10"
         >
-          {timerStarted ? 
-            (language === 'fr' ? 'Réinitialiser' : 'Reset') : 
-            (language === 'fr' ? 'Commencer' : 'Start')
-          } 🎨
+          {timerStarted ? 'Réinitialiser' : 'Commencer'} 🎨
         </motion.button>
       )}
 
