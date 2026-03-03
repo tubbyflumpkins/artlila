@@ -277,16 +277,6 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 
             {/* Center hub with gold gradient */}
             <circle cx="200" cy="200" r="32" fill="url(#hubGradient)" stroke="#B8860B" strokeWidth="3" />
-            <text
-              x="200"
-              y="200"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="font-bold select-none"
-              style={{ fontSize: '11px', fill: '#5D4E37' }}
-            >
-              TOURNE!
-            </text>
           </svg>
         </motion.div>
       </div>
