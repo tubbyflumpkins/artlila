@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import PresentationList from '@/components/PresentationList';
 import { week1Presentations } from '@/lib/presentations/week1';
+import { week27Presentations } from '@/lib/presentations/week27';
 import { Presentation } from '@/lib/presentations/types';
 
 export default function WeekLesson() {
@@ -17,9 +18,8 @@ export default function WeekLesson() {
     switch (week) {
       case '1':
         return week1Presentations;
-      // Add more weeks as they are created
-      // case '2':
-      //   return week2Presentations;
+      case '27':
+        return week27Presentations;
       default:
         return [];
     }

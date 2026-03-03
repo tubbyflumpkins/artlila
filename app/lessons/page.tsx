@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Presentation, getWeekDate } from '@/lib/presentations/types';
 import { week1Presentations } from '@/lib/presentations/week1';
+import { week27Presentations } from '@/lib/presentations/week27';
 
 // Aggregate all presentations from all weeks
 const allPresentations: Presentation[] = [
   ...week1Presentations,
-  // Add future weeks here: ...week2Presentations, etc.
+  ...week27Presentations,
 ];
 
 // Sort newest first (highest week number first)
