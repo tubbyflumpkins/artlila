@@ -109,17 +109,7 @@ export const animationFlipbook: Presentation = {
       },
     },
 
-    // Slide 8 — Live Demo
-    {
-      type: 'text',
-      content: {
-        heading: { fr: 'Démonstration en direct !', en: 'Live Demo!' },
-        text: { fr: '👀 Regardez bien...', en: '👀 Watch closely...' },
-        alignment: 'center',
-      },
-    },
-
-    // Slide 9 — Your Flipbook Project (3 Steps)
+    // Slide 8 — Your Flipbook Project (3 Steps)
     {
       type: 'custom',
       content: {
