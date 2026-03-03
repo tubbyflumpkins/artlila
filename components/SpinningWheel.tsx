@@ -36,6 +36,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 }, ref) => {
   const [rotation, setRotation] = useState(0);
   const lastTickRef = useRef(0);
+  const lastSoundTimeRef = useRef(0);
   const rotationRef = useRef(0);
   const startRotationRef = useRef(0);
   const endRotationRef = useRef(0);
@@ -112,9 +113,16 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
           const progress = (latest - startRotationRef.current) / (endRotationRef.current - startRotationRef.current);
           const speedFactor = Math.max(0, 1 - progress);
 
-          playPegPop(speedFactor);
+          // Rate-limit sounds: at high speed skip most pops, let them through as wheel slows
+          // Min interval scales from 120ms (fast) down to 0ms (slow/stopped)
+          const now = performance.now();
+          const minInterval = Math.max(0, (1 - progress) * 120);
+          if (now - lastSoundTimeRef.current >= minInterval) {
+            playPegPop(speedFactor);
+            lastSoundTimeRef.current = now;
+          }
 
-          // Impulse flapper proportional to speed
+          // Flapper always bounces regardless of sound throttle
           flapperVelocity.current = speedFactor * 12;
           if (!flapperRaf.current || Math.abs(flapperAngle.current) < 0.1) {
             flapperRaf.current = requestAnimationFrame(updateFlapper);

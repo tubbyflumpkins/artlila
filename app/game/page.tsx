@@ -37,36 +37,50 @@ export default function Game() {
     initializeAudio();
   }, []);
 
-  // Emoji confetti helper
+  // Emoji confetti helper - dramatic multi-burst
   const fireEmojiConfetti = (emoji: string, originX: number) => {
-    const scalar = 2;
+    const scalar = 3;
     const shape = confetti.shapeFromText({ text: emoji, scalar });
 
-    // First burst
+    // Big center burst
     confetti({
-      particleCount: 40,
-      spread: 80,
+      particleCount: 60,
+      spread: 120,
       origin: { x: originX, y: 0.5 },
       shapes: [shape],
       scalar,
-      ticks: 60,
-      gravity: 0.8,
-      startVelocity: 30,
+      ticks: 100,
+      gravity: 0.6,
+      startVelocity: 45,
     });
 
-    // Staggered second burst
+    // Staggered second burst - upward
+    setTimeout(() => {
+      confetti({
+        particleCount: 40,
+        spread: 90,
+        origin: { x: originX, y: 0.55 },
+        shapes: [shape],
+        scalar,
+        ticks: 100,
+        gravity: 0.5,
+        startVelocity: 35,
+      });
+    }, 150);
+
+    // Third burst - wide scatter
     setTimeout(() => {
       confetti({
         particleCount: 30,
-        spread: 60,
+        spread: 160,
         origin: { x: originX, y: 0.45 },
         shapes: [shape],
-        scalar,
-        ticks: 60,
-        gravity: 0.8,
+        scalar: scalar * 0.8,
+        ticks: 80,
+        gravity: 0.7,
         startVelocity: 25,
       });
-    }, 150);
+    }, 350);
   };
 
   const handleTopicComplete = (result: WheelSegment) => {
@@ -162,19 +176,84 @@ export default function Game() {
 
   if (wheelData.topics.length === 0 || wheelData.constraints.length === 0) {
     return (
-      <main className="min-h-screen bg-[radial-gradient(ellipse_at_center,#1a0a3e,#0a0a2e)] flex items-center justify-center">
+      <main className="min-h-screen bg-[#1a1040] flex items-center justify-center">
         <div className="text-amber-100 text-2xl">Chargement des données...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_center,#1a0a3e,#0a0a2e)] flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Subtle ambient glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+    <main className="min-h-screen bg-[#1a1040] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Dynamic floating color blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
+          style={{
+            background: 'radial-gradient(circle, #a855f7, transparent 70%)',
+            animation: 'floatBlob1 20s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute w-[400px] h-[400px] rounded-full blur-[100px] opacity-15"
+          style={{
+            background: 'radial-gradient(circle, #3b82f6, transparent 70%)',
+            animation: 'floatBlob2 25s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute w-[450px] h-[450px] rounded-full blur-[110px] opacity-15"
+          style={{
+            background: 'radial-gradient(circle, #ec4899, transparent 70%)',
+            animation: 'floatBlob3 22s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute w-[350px] h-[350px] rounded-full blur-[90px] opacity-12"
+          style={{
+            background: 'radial-gradient(circle, #f59e0b, transparent 70%)',
+            animation: 'floatBlob4 18s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute w-[300px] h-[300px] rounded-full blur-[80px] opacity-10"
+          style={{
+            background: 'radial-gradient(circle, #10b981, transparent 70%)',
+            animation: 'floatBlob5 24s ease-in-out infinite',
+          }}
+        />
       </div>
+      <style jsx>{`
+        @keyframes floatBlob1 {
+          0%, 100% { top: 10%; left: 15%; }
+          25% { top: 60%; left: 70%; }
+          50% { top: 30%; left: 80%; }
+          75% { top: 70%; left: 20%; }
+        }
+        @keyframes floatBlob2 {
+          0%, 100% { top: 70%; left: 60%; }
+          25% { top: 20%; left: 10%; }
+          50% { top: 50%; left: 40%; }
+          75% { top: 10%; left: 75%; }
+        }
+        @keyframes floatBlob3 {
+          0%, 100% { top: 40%; left: 80%; }
+          25% { top: 70%; left: 30%; }
+          50% { top: 10%; left: 50%; }
+          75% { top: 55%; left: 65%; }
+        }
+        @keyframes floatBlob4 {
+          0%, 100% { top: 80%; left: 20%; }
+          25% { top: 30%; left: 50%; }
+          50% { top: 60%; left: 70%; }
+          75% { top: 15%; left: 35%; }
+        }
+        @keyframes floatBlob5 {
+          0%, 100% { top: 20%; left: 45%; }
+          25% { top: 65%; left: 80%; }
+          50% { top: 75%; left: 15%; }
+          75% { top: 35%; left: 60%; }
+        }
+      `}</style>
 
       <AnimatePresence mode="wait">
         {!timerStarted && (
