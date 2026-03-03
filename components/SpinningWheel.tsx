@@ -191,7 +191,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
   }), [handleSpin]);
 
   return (
-    <div className="relative" style={{ width: 'min(50vh, 45vw)', height: 'min(50vh, 45vw)' }}>
+    <div className="relative" style={{ width: 'min(65vh, 45vw)', height: 'min(65vh, 45vw)' }}>
       {/* Flapper - positioned at top, outside rotating SVG */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 z-10"

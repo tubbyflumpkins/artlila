@@ -294,28 +294,6 @@ export default function Game() {
         }
       `}</style>
 
-      <AnimatePresence mode="wait">
-        {!timerStarted && (
-          <motion.div
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -50, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="text-center mb-6 relative z-10"
-          >
-            <h1
-              className="text-6xl font-bold mb-2"
-              style={{
-                color: '#FFECD2',
-                textShadow: '0 0 40px rgba(255, 215, 0, 0.3), 0 2px 8px rgba(0,0,0,0.5)'
-              }}
-            >
-              Moment Dessin
-            </h1>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <motion.div
         animate={{
           y: timerStarted ? -20 : 0,
@@ -359,11 +337,11 @@ export default function Game() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.3, y: -20 }}
                 transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                className="mt-4 bg-gray-900/80 border-2 border-yellow-400/50 rounded-2xl px-6 py-3"
+                className="mt-4 bg-gray-900/80 border-2 border-yellow-400/50 rounded-2xl px-8 py-4"
                 style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.15)' }}
               >
-                <p className="text-2xl font-bold text-white">
-                  <span className="text-3xl mr-2">{selectedTopic.emoji}</span>
+                <p className="text-4xl font-bold text-white">
+                  <span className="text-5xl mr-3">{selectedTopic.emoji}</span>
                   {selectedTopic.text}
                 </p>
               </motion.div>
@@ -402,11 +380,11 @@ export default function Game() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.3, y: -20 }}
                 transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                className="mt-4 bg-gray-900/80 border-2 border-yellow-400/50 rounded-2xl px-6 py-3"
+                className="mt-4 bg-gray-900/80 border-2 border-yellow-400/50 rounded-2xl px-8 py-4"
                 style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.15)' }}
               >
-                <p className="text-2xl font-bold text-white">
-                  <span className="text-3xl mr-2">{selectedConstraint.emoji}</span>
+                <p className="text-4xl font-bold text-white">
+                  <span className="text-5xl mr-3">{selectedConstraint.emoji}</span>
                   {selectedConstraint.text}
                 </p>
               </motion.div>
