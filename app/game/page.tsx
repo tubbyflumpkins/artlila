@@ -454,9 +454,6 @@ export default function Game() {
                   Excellent travail! Ton dessin est terminé!
                 </motion.p>
               )}
-              <p className="mt-4 text-sm text-amber-100/40 text-center">
-                Appuie sur espace pour réinitialiser
-              </p>
             </div>
           </motion.div>
         )}
