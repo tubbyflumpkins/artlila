@@ -82,3 +82,12 @@ export interface WeekPresentations {
   week: number;
   presentations: Presentation[];
 }
+
+// School year starts September 1, 2025
+const SCHOOL_YEAR_START = new Date(2025, 8, 1); // Month is 0-indexed
+
+export function getWeekDate(week: number): Date {
+  const date = new Date(SCHOOL_YEAR_START);
+  date.setDate(date.getDate() + (week - 1) * 7);
+  return date;
+}

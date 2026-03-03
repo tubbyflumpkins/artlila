@@ -2,9 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { CustomSlideProps } from '@/lib/presentations/types';
-
-interface FourImageGridProps extends CustomSlideProps {
+interface FourImageGridProps {
   images: string[];
 }
 

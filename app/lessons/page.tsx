@@ -1,19 +1,33 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Presentation, getWeekDate } from '@/lib/presentations/types';
+import { week1Presentations } from '@/lib/presentations/week1';
 
-const TOTAL_WEEKS = 36; // Academic year
+// Aggregate all presentations from all weeks
+const allPresentations: Presentation[] = [
+  ...week1Presentations,
+  // Add future weeks here: ...week2Presentations, etc.
+];
+
+// Sort newest first (highest week number first)
+const sortedPresentations = [...allPresentations].sort((a, b) => b.week - a.week);
+
+function formatWeekDate(week: number): string {
+  const date = getWeekDate(week);
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
 
 export default function Lessons() {
-  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
-
-  const weeks = Array.from({ length: TOTAL_WEEKS }, (_, i) => i + 1);
-
   return (
     <main className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -22,53 +36,34 @@ export default function Lessons() {
         >
           <Link href="/" className="inline-block mb-6">
             <button className="font-neue-haas font-medium text-gray-600 hover:text-gray-800 transition-colors">
-              ← Retour
+              ← Back
             </button>
           </Link>
-          <h1 className="text-5xl font-neue-haas font-bold text-gray-800">Leçons</h1>
-          <p className="text-lg font-neue-haas font-normal text-gray-600 mt-2">Organisé par semaine</p>
+          <h1 className="text-5xl font-neue-haas font-bold text-gray-800">Lessons</h1>
         </motion.div>
 
-        {/* Week Grid */}
+        {/* Presentations List */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+          className="flex flex-col gap-3"
         >
-          {weeks.map((week) => (
-            <Link key={week} href={`/lessons/${week}`}>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`
-                  relative aspect-square bg-white border-2 border-gray-200 
-                  rounded-lg hover:border-gray-400 hover:shadow-lg 
-                  transition-all duration-200 flex flex-col items-center 
-                  justify-center p-4
-                `}
-              >
-                <span className="text-3xl font-neue-haas font-bold text-gray-700">
-                  {week}
+          {sortedPresentations.map((presentation) => (
+            <Link
+              key={presentation.id}
+              href={`/lessons/${presentation.week}/${presentation.id}`}
+            >
+              <div className="bg-white border-2 border-gray-200 rounded-lg px-6 py-4 hover:border-gray-400 hover:shadow-lg transition-all duration-200 flex items-center justify-between">
+                <span className="text-lg font-neue-haas font-bold text-gray-700">
+                  {presentation.title}
                 </span>
-                <span className="text-xs font-neue-haas font-medium text-gray-500 mt-1">
-                  Semaine
+                <span className="text-sm font-neue-haas font-normal text-gray-500 ml-4 whitespace-nowrap">
+                  {formatWeekDate(presentation.week)}
                 </span>
-              </motion.button>
+              </div>
             </Link>
           ))}
-        </motion.div>
-
-        {/* Current Week Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-12 text-center text-gray-600"
-        >
-          <p className="text-sm font-neue-haas font-normal">
-            Cliquez sur une semaine pour voir les leçons
-          </p>
         </motion.div>
       </div>
     </main>
