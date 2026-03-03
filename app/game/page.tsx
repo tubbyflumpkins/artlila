@@ -82,7 +82,7 @@ export default function Game() {
         ? Math.random() * 0.5
         : 0.5 + Math.random() * 0.5;
       confetti({
-        particleCount: 3,
+        particleCount: 2,
         angle: 90,
         spread: 15,
         origin: { x, y: -0.05 },
@@ -96,7 +96,7 @@ export default function Game() {
         zIndex: 5,
       });
       count++;
-      if (count >= 40) {
+      if (count >= 28) {
         clearInterval(ref.current!);
         ref.current = null;
       }
