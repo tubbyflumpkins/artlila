@@ -23,6 +23,11 @@ export default function Game() {
   const [timerPaused, setTimerPaused] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes
   const [timerComplete, setTimerComplete] = useState(false);
+  const [animationTick, setAnimationTick] = useState(0);
+  const [patternIndex, setPatternIndex] = useState(0);
+
+  const animationTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const patternTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const topicWheelRef = useRef<SpinningWheelHandle>(null);
   const constraintWheelRef = useRef<SpinningWheelHandle>(null);
@@ -41,6 +46,26 @@ export default function Game() {
     document.body.classList.add('game-page');
     return () => document.body.classList.remove('game-page');
   }, []);
+
+  // Synchronized festive animation tick — drives both wheels in lockstep
+  const wheelsIdle = !isSpinningTopic && !isSpinningConstraint && !selectedTopic && !selectedConstraint;
+  useEffect(() => {
+    if (wheelsIdle) {
+      animationTickRef.current = setInterval(() => {
+        setAnimationTick(prev => prev + 1);
+      }, 100);
+      patternTickRef.current = setInterval(() => {
+        setPatternIndex(prev => prev + 1);
+      }, 4000);
+    } else {
+      if (animationTickRef.current) { clearInterval(animationTickRef.current); animationTickRef.current = null; }
+      if (patternTickRef.current) { clearInterval(patternTickRef.current); patternTickRef.current = null; }
+    }
+    return () => {
+      if (animationTickRef.current) clearInterval(animationTickRef.current);
+      if (patternTickRef.current) clearInterval(patternTickRef.current);
+    };
+  }, [wheelsIdle]);
 
   // Emoji rain - gentle falling emoji behind the wheel
   const startEmojiRain = (emoji: string, side: 'left' | 'right') => {
@@ -61,13 +86,14 @@ export default function Game() {
         shapes: [shape],
         scalar,
         flat: true,
-        gravity: 1,
-        startVelocity: 8,
-        ticks: 200,
+        gravity: 0.6,
+        startVelocity: 12,
+        ticks: 400,
         drift: (Math.random() - 0.5) * 0.3,
+        zIndex: 5,
       });
       count++;
-      if (count >= 25) {
+      if (count >= 40) {
         clearInterval(ref.current!);
         ref.current = null;
       }
@@ -93,6 +119,8 @@ export default function Game() {
     setTimerPaused(false);
     setTimeRemaining(300);
     setTimerComplete(false);
+    setAnimationTick(0);
+    setPatternIndex(0);
     if (leftRainRef.current) { clearInterval(leftRainRef.current); leftRainRef.current = null; }
     if (rightRainRef.current) { clearInterval(rightRainRef.current); rightRainRef.current = null; }
   };
@@ -316,6 +344,8 @@ export default function Game() {
             onSpinComplete={handleTopicComplete}
             isSpinning={isSpinningTopic}
             setIsSpinning={setIsSpinningTopic}
+            animationTick={animationTick}
+            patternIndex={patternIndex}
           />
 
           <AnimatePresence mode="wait">
@@ -357,6 +387,8 @@ export default function Game() {
             onSpinComplete={handleConstraintComplete}
             isSpinning={isSpinningConstraint}
             setIsSpinning={setIsSpinningConstraint}
+            animationTick={animationTick}
+            patternIndex={patternIndex}
           />
 
           <AnimatePresence mode="wait">

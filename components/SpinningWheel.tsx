@@ -19,10 +19,9 @@ interface SpinningWheelProps {
   onSpinComplete: (result: WheelSegment) => void;
   isSpinning: boolean;
   setIsSpinning: (spinning: boolean) => void;
+  animationTick: number;
+  patternIndex: number;
 }
-
-// Chasing color pattern: red, cream, cream - creates a rotating ring effect
-const CHASE_COLORS = ['#DC2626', '#FEF3E2', '#FEF3E2'];
 
 // Flapper spring physics constants
 const SPRING_STIFFNESS = 0.3;
@@ -33,42 +32,79 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
   segments,
   onSpinComplete,
   isSpinning,
-  setIsSpinning
+  setIsSpinning,
+  animationTick,
+  patternIndex
 }, ref) => {
   const [rotation, setRotation] = useState(0);
-  const [colorOffset, setColorOffset] = useState(0);
   const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
-  const colorIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [revealStep, setRevealStep] = useState<number | null>(null);
+  const revealTargetRef = useRef<number>(0);
   const lastTickRef = useRef(0);
   const lastSoundTimeRef = useRef(0);
   const rotationRef = useRef(0);
   const startRotationRef = useRef(0);
   const endRotationRef = useRef(0);
 
-  // Animated chasing colors: cycle while idle (no winner, not spinning), freeze otherwise
+  // Winner reveal scan: sweep red highlight around wheel then land on winner
   useEffect(() => {
-    if (!isSpinning && winnerIndex === null) {
-      colorIntervalRef.current = setInterval(() => {
-        setColorOffset(prev => prev + 1);
-      }, 150);
-    } else {
-      if (colorIntervalRef.current) {
-        clearInterval(colorIntervalRef.current);
-        colorIntervalRef.current = null;
-      }
+    if (revealStep === null) return;
+    const totalSteps = segments.length + revealTargetRef.current;
+    if (revealStep >= totalSteps) {
+      // Scan complete — lock winner and notify parent
+      setRevealStep(null);
+      setWinnerIndex(revealTargetRef.current);
+      const winner = segments[revealTargetRef.current];
+      setTimeout(() => {
+        onSpinComplete(winner);
+        setIsSpinning(false);
+      }, 300);
+      return;
     }
-    return () => {
-      if (colorIntervalRef.current) clearInterval(colorIntervalRef.current);
-    };
-  }, [isSpinning, winnerIndex]);
+    const timer = setTimeout(() => {
+      setRevealStep(prev => (prev !== null ? prev + 1 : null));
+    }, 60);
+    return () => clearTimeout(timer);
+  }, [revealStep, segments, onSpinComplete, setIsSpinning]);
 
   const getSegmentColor = (index: number) => {
+    const n = segments.length;
+
+    // 1. Reveal scan in progress
+    if (revealStep !== null) {
+      const scanPos = revealStep % n;
+      return scanPos === index ? '#DC2626' : '#FEF3E2';
+    }
+
+    // 2. Post-reveal: winner red, rest cream
     if (winnerIndex !== null) {
-      // After spin: winner is red, everything else cream
       return index === winnerIndex ? '#DC2626' : '#FEF3E2';
     }
-    // Before/during spin: chasing animation (frozen when spinning)
-    return CHASE_COLORS[(index + colorOffset) % CHASE_COLORS.length];
+
+    // 3. Festive patterns (driven by parent tick + patternIndex)
+    const tick = animationTick;
+    const pattern = patternIndex % 4;
+
+    switch (pattern) {
+      case 0: // Rainbow wave
+        return `hsl(${(index * 360 / n + tick * 8) % 360}, 80%, 55%)`;
+      case 1: // Red/cream chase (original pattern)
+        return ['#DC2626', '#FEF3E2', '#FEF3E2'][(index + tick) % 3];
+      case 2: // Amber/purple checkerboard that swaps each tick
+        return (index + tick) % 2 === 0 ? '#F59E0B' : '#8B5CF6';
+      case 3: { // Dual sweep — two red highlights chase in opposite directions
+        const pos1 = tick % n;
+        const pos2 = (n - 1 - (tick % n)) % n;
+        if (index === pos1 || index === pos2) return '#DC2626';
+        // Trailing glow
+        const prev1 = (pos1 - 1 + n) % n;
+        const prev2 = (pos2 - 1 + n) % n;
+        if (index === prev1 || index === prev2) return '#FCA5A5';
+        return '#FEF3E2';
+      }
+      default:
+        return '#FEF3E2';
+    }
   };
 
   // Flapper physics refs
@@ -122,6 +158,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
 
     setIsSpinning(true);
     setWinnerIndex(null);
+    setRevealStep(null);
 
     const spins = 5 + Math.random() * 3;
     const currentRotation = rotationRef.current;
@@ -166,13 +203,10 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
         const normalizedRotation = finalRotation % 360;
         const topAngle = (270 - normalizedRotation + 360) % 360;
         const winIdx = Math.floor(topAngle / segmentAngle) % segments.length;
-        const winner = segments[winIdx];
 
-        setWinnerIndex(winIdx);
-        setTimeout(() => {
-          onSpinComplete(winner);
-          setIsSpinning(false);
-        }, 500);
+        // Start reveal scan instead of immediately showing winner
+        revealTargetRef.current = winIdx;
+        setRevealStep(0);
       }
     });
   }, [isSpinning, setIsSpinning, segments, segmentAngle, numberOfPegs, onSpinComplete, updateFlapper]);
