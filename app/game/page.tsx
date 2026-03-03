@@ -44,7 +44,13 @@ export default function Game() {
 
     // Invert logo for dark background
     document.body.classList.add('game-page');
-    return () => document.body.classList.remove('game-page');
+    return () => {
+      document.body.classList.remove('game-page');
+      // Clean up confetti canvas so emojis don't persist on other pages
+      confetti.reset();
+      if (leftRainRef.current) { clearInterval(leftRainRef.current); leftRainRef.current = null; }
+      if (rightRainRef.current) { clearInterval(rightRainRef.current); rightRainRef.current = null; }
+    };
   }, []);
 
   // Synchronized festive animation tick — drives both wheels in lockstep
