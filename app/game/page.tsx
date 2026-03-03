@@ -155,12 +155,21 @@ export default function Game() {
       } else if (e.key === '2') {
         e.preventDefault();
         constraintWheelRef.current?.spin();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        if (selectedTopic && selectedConstraint) {
+          if (timerStarted) {
+            handleReset();
+          } else {
+            handleStartTimer();
+          }
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [selectedTopic, selectedConstraint, timerStarted]);
 
   // Timer effect
   useEffect(() => {
@@ -393,23 +402,23 @@ export default function Game() {
         </motion.div>
       </motion.div>
 
-      {/* Timer Display */}
+      {/* Timer Display — floating overlay centered on screen */}
       <AnimatePresence mode="wait">
         {timerStarted && selectedTopic && selectedConstraint && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
-            className="mt-4 mb-2 text-center relative z-10"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
           >
             <div
-              className="bg-gray-900/80 border-2 border-yellow-400/30 rounded-3xl p-8 cursor-pointer"
-              style={{ boxShadow: '0 0 30px rgba(255, 215, 0, 0.1)' }}
+              className="bg-gray-900/90 backdrop-blur-md border-2 border-yellow-400/30 rounded-3xl p-10 cursor-pointer pointer-events-auto"
+              style={{ boxShadow: '0 0 60px rgba(255, 215, 0, 0.15), 0 0 120px rgba(0,0,0,0.5)' }}
               onClick={togglePause}
             >
               <h2
-                className="text-6xl font-bold mb-6"
+                className="text-7xl font-bold mb-6 text-center"
                 style={{
                   color: timerComplete ? '#4ADE80' : '#FFECD2',
                   textShadow: timerComplete
@@ -422,7 +431,7 @@ export default function Game() {
                   (
                     <>
                       {formatTime(timeRemaining)}
-                      {timerPaused && <span className="text-3xl ml-4">⏸️</span>}
+                      {timerPaused && <span className="text-4xl ml-4">⏸️</span>}
                     </>
                   )
                 }
@@ -440,29 +449,18 @@ export default function Game() {
                 <motion.p
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 text-xl font-medium text-amber-100/80"
+                  className="mt-4 text-xl font-medium text-amber-100/80 text-center"
                 >
                   Excellent travail! Ton dessin est terminé!
                 </motion.p>
               )}
+              <p className="mt-4 text-sm text-amber-100/40 text-center">
+                Appuie sur espace pour réinitialiser
+              </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {selectedTopic && selectedConstraint && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={timerStarted ? handleReset : handleStartTimer}
-          className="mt-8 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-bold text-xl px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-shadow relative z-10"
-        >
-          {timerStarted ? 'Réinitialiser' : 'Commencer'} 🎨
-        </motion.button>
-      )}
 
       <EditButton />
     </main>
