@@ -44,25 +44,29 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
   const startRotationRef = useRef(0);
   const endRotationRef = useRef(0);
 
+  // Alternate cream shades so adjacent white wedges are distinguishable
+  const cream = (index: number) => index % 2 === 0 ? '#FEF3E2' : '#E8DDD0';
+
   const getSegmentColor = (index: number) => {
     const n = segments.length;
 
-    // Post-spin: winner red, neighbors pink, rest cream
+    // Post-spin: winner red, neighbors pink, rest alternating cream
     if (winnerIndex !== null) {
       if (index === winnerIndex) return '#DC2626';
       const prev = (winnerIndex - 1 + n) % n;
       const next = (winnerIndex + 1) % n;
       if (index === prev || index === next) return '#FCA5A5';
-      return '#FEF3E2';
+      return cream(index);
     }
 
-    // 3. Festive patterns (driven by parent tick + patternIndex)
+    // Festive patterns (driven by parent tick + patternIndex)
     const tick = animationTick;
     const pattern = patternIndex % 2;
 
     if (pattern === 0) {
-      // Red/cream chase (original pattern)
-      return ['#DC2626', '#FEF3E2', '#FEF3E2'][(index + tick) % 3];
+      // Red/cream chase
+      const slot = (index + tick) % 3;
+      return slot === 0 ? '#DC2626' : cream(index);
     } else {
       // Dual sweep — two red highlights chase in opposite directions
       const pos1 = tick % n;
@@ -72,7 +76,7 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
       const prev1 = (pos1 - 1 + n) % n;
       const prev2 = (pos2 - 1 + n) % n;
       if (index === prev1 || index === prev2) return '#FCA5A5';
-      return '#FEF3E2';
+      return cream(index);
     }
   };
 

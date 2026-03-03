@@ -74,22 +74,25 @@ export default function Game() {
 
     const scalar = 7.5;
     const shape = confetti.shapeFromText({ text: emoji, scalar });
-    const baseX = side === 'left' ? 0.25 : 0.75;
 
     let count = 0;
     ref.current = setInterval(() => {
+      // Spread evenly across the half: left = 0..0.5, right = 0.5..1.0
+      const x = side === 'left'
+        ? Math.random() * 0.5
+        : 0.5 + Math.random() * 0.5;
       confetti({
         particleCount: 3,
         angle: 90,
-        spread: 35,
-        origin: { x: baseX + (Math.random() - 0.5) * 0.2, y: -0.05 },
+        spread: 15,
+        origin: { x, y: -0.05 },
         shapes: [shape],
         scalar,
         flat: true,
         gravity: 0.4,
         startVelocity: 15,
         ticks: 800,
-        drift: (Math.random() - 0.5) * 0.3,
+        drift: (Math.random() - 0.5) * 0.15,
         zIndex: 5,
       });
       count++;
