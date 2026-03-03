@@ -8,30 +8,22 @@ interface EditModalProps {
   onClose: () => void;
   topicsData: string;
   constraintsData: string;
-  topicsDataEn: string;
-  constraintsDataEn: string;
-  onSave: (topics: string, constraints: string, topicsEn: string, constraintsEn: string) => void;
+  onSave: (topics: string, constraints: string) => void;
 }
 
-const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, topicsData, constraintsData, topicsDataEn, constraintsDataEn, onSave }) => {
+const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, topicsData, constraintsData, onSave }) => {
   const [topics, setTopics] = useState(topicsData);
   const [constraints, setConstraints] = useState(constraintsData);
-  const [topicsEn, setTopicsEn] = useState(topicsDataEn);
-  const [constraintsEn, setConstraintsEn] = useState(constraintsDataEn);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'fr' | 'en'>('fr');
 
-  // Update state when props change (when modal opens with new data)
   React.useEffect(() => {
     setTopics(topicsData);
     setConstraints(constraintsData);
-    setTopicsEn(topicsDataEn);
-    setConstraintsEn(constraintsDataEn);
-  }, [topicsData, constraintsData, topicsDataEn, constraintsDataEn]);
+  }, [topicsData, constraintsData]);
 
   const handleSave = async () => {
     setIsSaving(true);
-    await onSave(topics, constraints, topicsEn, constraintsEn);
+    await onSave(topics, constraints);
     setIsSaving(false);
     onClose();
   };
@@ -54,107 +46,50 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, topicsData, cons
             className="fixed inset-4 lg:inset-12 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col"
           >
             <div className="p-6 border-b">
-              <h2 className="text-2xl font-bold text-gray-800">Modifier le contenu des roues / Edit Wheel Content</h2>
-              <p className="text-sm text-gray-600 mt-1">Format: Text Description, Emoji (one per line)</p>
-              
-              {/* Language Tabs */}
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={() => setActiveTab('fr')}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                    activeTab === 'fr'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  Français
-                </button>
-                <button
-                  onClick={() => setActiveTab('en')}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                    activeTab === 'en'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  English
-                </button>
+              <h2 className="text-2xl font-bold text-gray-800">Modifier le contenu des roues</h2>
+              <p className="text-sm text-gray-600 mt-1">Format: Text Description, Emoji (une par ligne)</p>
+            </div>
+
+            <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 flex-1 overflow-y-auto">
+              <div className="flex flex-col h-full">
+                <label className="block text-lg font-semibold text-gray-700 mb-2">
+                  Sujets (Quoi dessiner)
+                </label>
+                <textarea
+                  value={topics}
+                  onChange={(e) => setTopics(e.target.value)}
+                  className="w-full flex-1 p-4 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none resize-none"
+                  placeholder="Animaux sauvages, 🦁"
+                />
+              </div>
+
+              <div className="flex flex-col h-full">
+                <label className="block text-lg font-semibold text-gray-700 mb-2">
+                  Contraintes (Comment dessiner)
+                </label>
+                <textarea
+                  value={constraints}
+                  onChange={(e) => setConstraints(e.target.value)}
+                  className="w-full flex-1 p-4 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none resize-none"
+                  placeholder="Une ligne continue, ✏️"
+                />
               </div>
             </div>
-            
-            <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 flex-1 overflow-y-auto">
-              {activeTab === 'fr' ? (
-                <>
-                  <div className="flex flex-col h-full">
-                    <label className="block text-lg font-semibold text-gray-700 mb-2">
-                      Sujets (Quoi dessiner)
-                    </label>
-                    <textarea
-                      value={topics}
-                      onChange={(e) => setTopics(e.target.value)}
-                      className="w-full flex-1 p-4 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none resize-none"
-                      placeholder="Animaux sauvages, 🦁"
-                    />
-                  </div>
-                  
-                  <div className="flex flex-col h-full">
-                    <label className="block text-lg font-semibold text-gray-700 mb-2">
-                      Contraintes (Comment dessiner)
-                    </label>
-                    <textarea
-                      value={constraints}
-                      onChange={(e) => setConstraints(e.target.value)}
-                      className="w-full flex-1 p-4 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none resize-none"
-                      placeholder="Une ligne continue, ✏️"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-col h-full">
-                    <label className="block text-lg font-semibold text-gray-700 mb-2">
-                      Topics (What to draw)
-                    </label>
-                    <textarea
-                      value={topicsEn}
-                      onChange={(e) => setTopicsEn(e.target.value)}
-                      className="w-full flex-1 p-4 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none resize-none"
-                      placeholder="Wild Animals, 🦁"
-                    />
-                  </div>
-                  
-                  <div className="flex flex-col h-full">
-                    <label className="block text-lg font-semibold text-gray-700 mb-2">
-                      Constraints (How to draw)
-                    </label>
-                    <textarea
-                      value={constraintsEn}
-                      onChange={(e) => setConstraintsEn(e.target.value)}
-                      className="w-full flex-1 p-4 border-2 border-gray-300 rounded-lg font-mono text-sm focus:border-blue-500 focus:outline-none resize-none"
-                      placeholder="One continuous line, ✏️"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-            
+
             <div className="p-6 border-t flex justify-end gap-4">
               <button
                 onClick={onClose}
                 className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                 disabled={isSaving}
               >
-                {activeTab === 'fr' ? 'Annuler' : 'Cancel'}
+                Annuler
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving}
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSaving ? 
-                  (activeTab === 'fr' ? 'Enregistrement...' : 'Saving...') : 
-                  (activeTab === 'fr' ? 'Enregistrer les modifications' : 'Save changes')
-                }
+                {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
               </button>
             </div>
           </motion.div>
@@ -168,36 +103,30 @@ const EditButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [topicsData, setTopicsData] = useState('');
   const [constraintsData, setConstraintsData] = useState('');
-  const [topicsDataEn, setTopicsDataEn] = useState('');
-  const [constraintsDataEn, setConstraintsDataEn] = useState('');
 
   const handleEditClick = async () => {
-    // Fetch current wheel data
     try {
       const response = await fetch('/api/wheel-data/raw');
       const data = await response.json();
       setTopicsData(data.topics);
       setConstraintsData(data.constraints);
-      setTopicsDataEn(data.topicsEn || '');
-      setConstraintsDataEn(data.constraintsEn || '');
       setIsModalOpen(true);
     } catch (error) {
       console.error('Échec du chargement des données des roues:', error);
     }
   };
 
-  const handleSave = async (topics: string, constraints: string, topicsEn: string, constraintsEn: string) => {
+  const handleSave = async (topics: string, constraints: string) => {
     try {
       const response = await fetch('/api/wheel-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ topics, constraints, topicsEn, constraintsEn }),
+        body: JSON.stringify({ topics, constraints }),
       });
 
       if (response.ok) {
-        // Reload the page to reflect changes
         window.location.reload();
       } else {
         console.error('Échec de l\'enregistrement des données des roues');
@@ -239,8 +168,6 @@ const EditButton: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         topicsData={topicsData}
         constraintsData={constraintsData}
-        topicsDataEn={topicsDataEn}
-        constraintsDataEn={constraintsDataEn}
         onSave={handleSave}
       />
     </>
