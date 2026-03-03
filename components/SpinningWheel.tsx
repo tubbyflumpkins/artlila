@@ -130,7 +130,6 @@ const SpinningWheel = forwardRef<SpinningWheelHandle, SpinningWheelProps>(({
     if (isSpinning) return;
 
     setIsSpinning(true);
-    setWinnerIndex(null);
 
     const spins = 5 + Math.random() * 3;
     const currentRotation = rotationRef.current;
