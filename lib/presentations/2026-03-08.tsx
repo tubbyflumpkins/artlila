@@ -97,6 +97,19 @@ export const rubeGoldberg: Presentation = {
         subtitle: { fr: 'Créer une machine Rube Goldberg', en: 'Create a Rube Goldberg machine' },
       },
     },
+
+    // Slide 9 — Details
+    {
+      type: 'bullets',
+      content: {
+        title: { fr: 'Détails', en: 'Details' },
+        bullets: [
+          { fr: 'Taille : 2 x 2 feet', en: 'Size: 2 x 2 feet' },
+          { fr: 'Support : Pegboard', en: 'Surface: Pegboard' },
+          { fr: 'Matériaux : Tous ce que vous voulez', en: 'Materials: Whatever you want' },
+        ],
+      },
+    },
   ],
 };
 
