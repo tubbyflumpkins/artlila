@@ -22,7 +22,7 @@ export const rubeGoldberg: Presentation = {
       content: {
         component: VideoLinkSlide,
         props: {
-          title: { fr: 'Regardons !', en: "Let's Watch!" },
+          title: '',
           url: 'https://youtu.be/qybUFnY7Y8w',
           embed: true,
           emoji: '⚙️',
@@ -36,7 +36,7 @@ export const rubeGoldberg: Presentation = {
       content: {
         component: VideoLinkSlide,
         props: {
-          title: { fr: 'Regardons !', en: "Let's Watch!" },
+          title: '',
           url: 'https://youtu.be/2U0BmR6B8fI',
           embed: true,
           emoji: '🔧',
@@ -71,7 +71,7 @@ export const rubeGoldberg: Presentation = {
       content: {
         component: VideoLinkSlide,
         props: {
-          title: { fr: 'Regardons !', en: "Let's Watch!" },
+          title: '',
           url: 'https://youtu.be/LwDdQ9xKu5s',
           embed: true,
           emoji: '🎨',
