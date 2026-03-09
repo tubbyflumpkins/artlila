@@ -78,6 +78,16 @@ export const rubeGoldberg: Presentation = {
         },
       },
     },
+
+    // Slide 7 — Fluffy McCloud's
+    {
+      type: 'image',
+      content: {
+        title: "Fluffy McCloud's - Echo Park",
+        imageUrl: '/images/2026-03-08/fluffy-mccloud.jpg',
+        size: 'large',
+      },
+    },
   ],
 };
 
