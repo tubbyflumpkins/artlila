@@ -88,6 +88,15 @@ export const rubeGoldberg: Presentation = {
         size: 'large',
       },
     },
+
+    // Slide 8 — Your Project
+    {
+      type: 'title',
+      content: {
+        title: { fr: 'Votre Projet', en: 'Your Project' },
+        subtitle: { fr: 'Créer une machine Rube Goldberg', en: 'Create a Rube Goldberg machine' },
+      },
+    },
   ],
 };
 
