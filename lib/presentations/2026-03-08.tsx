@@ -65,6 +65,20 @@ export const rubeGoldberg: Presentation = {
         title: { fr: 'Les Machines comme ART', en: 'Machines as ART' },
       },
     },
+
+    // Slide 6 — YouTube Video 3
+    {
+      type: 'custom',
+      content: {
+        component: VideoLinkSlide,
+        props: {
+          title: { fr: 'Regardons !', en: "Let's Watch!" },
+          url: 'https://youtu.be/LwDdQ9xKu5s',
+          embed: true,
+          emoji: '🎨',
+        },
+      },
+    },
   ],
 };
 
