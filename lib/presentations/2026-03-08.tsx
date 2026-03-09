@@ -110,6 +110,15 @@ export const rubeGoldberg: Presentation = {
         ],
       },
     },
+
+    // Slide 10 — Discussion
+    {
+      type: 'title',
+      content: {
+        title: { fr: 'Discussion', en: 'Discussion' },
+        subtitle: { fr: 'Quelles sont vos idées ?', en: 'What are your ideas?' },
+      },
+    },
   ],
 };
 
