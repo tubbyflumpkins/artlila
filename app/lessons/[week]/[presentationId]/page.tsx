@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import PresentationViewer from '@/components/PresentationViewer';
 import { week1Presentations } from '@/lib/presentations/week1';
 import { week27Presentations } from '@/lib/presentations/week27';
+import { date20260308Presentations } from '@/lib/presentations/2026-03-08';
 import { Presentation } from '@/lib/presentations/types';
 
 export default function PresentationPage() {
@@ -20,6 +21,8 @@ export default function PresentationPage() {
         return week1Presentations;
       case '27':
         return week27Presentations;
+      case '2026-03-08':
+        return date20260308Presentations;
       default:
         return [];
     }
