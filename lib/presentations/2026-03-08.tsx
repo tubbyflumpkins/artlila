@@ -13,8 +13,6 @@ export const rubeGoldberg: Presentation = {
       type: 'title',
       content: {
         title: { fr: 'Les Machines de Rube Goldberg', en: 'Rube Goldberg Machines' },
-        subtitle: { fr: 'Arts Plastiques', en: 'Art Class' },
-        date: '8 mars 2026',
       },
     },
 
