@@ -6,11 +6,13 @@ import { motion } from 'framer-motion';
 import { Presentation, getWeekDate } from '@/lib/presentations/types';
 import { week1Presentations } from '@/lib/presentations/week1';
 import { week27Presentations } from '@/lib/presentations/week27';
+import { date20260308Presentations } from '@/lib/presentations/2026-03-08';
 
 // Aggregate all presentations from all weeks
 const allPresentations: Presentation[] = [
   ...week1Presentations,
   ...week27Presentations,
+  ...date20260308Presentations,
 ];
 
 // Sort newest first (highest week number first)
@@ -53,7 +55,7 @@ export default function Lessons() {
           {sortedPresentations.map((presentation) => (
             <Link
               key={presentation.id}
-              href={`/lessons/${presentation.week}/${presentation.id}`}
+              href={`/lessons/${presentation.date || presentation.week}/${presentation.id}`}
             >
               <div className="bg-white border-2 border-gray-200 rounded-lg px-6 py-4 hover:border-gray-400 hover:shadow-lg transition-all duration-200 flex items-center justify-between">
                 <span className="text-lg font-neue-haas font-bold text-gray-700">

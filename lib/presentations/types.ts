@@ -6,6 +6,7 @@ export interface Presentation {
   title: string;
   description: string;
   week: number;
+  date?: string;
   slides: Slide[];
 }
 

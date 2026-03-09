@@ -6,6 +6,7 @@ export const rubeGoldberg: Presentation = {
   title: 'Rube Goldberg Machines',
   description: 'Introduction to Rube Goldberg machines',
   week: 28,
+  date: '2026-03-08',
   slides: [
     // Slide 1 — Title
     {
